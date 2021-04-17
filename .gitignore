@@ -27,4 +27,6 @@ out
 
 # Data files
 .idea/dataSources.xml
+
+# Lib files
 /lib/
