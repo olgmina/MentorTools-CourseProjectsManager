@@ -24,4 +24,12 @@ hs_err_pid*
 
 # Production files
 out
+
+# Data files
 .idea/dataSources.xml
+
+# Lib files
+/lib/
+
+# Project files
+/.idea/
