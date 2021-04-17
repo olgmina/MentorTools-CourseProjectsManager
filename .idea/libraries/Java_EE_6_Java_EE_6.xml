@@ -1,0 +1,36 @@
+<component name="libraryTable">
+  <library name="Java EE 6-Java EE 6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/javax.annotation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.ejb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.jms.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.persistence.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.resource.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.servlet.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.servlet.jsp.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.servlet.jsp.jstl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.transaction.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/sqlite-jdbc-3.8.10.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-swt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.controls.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.fxml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.graphics.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.media.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.swing.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx.web.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/sqlite-jdbc-3.8.10.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.base" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.controls" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.fxml" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.graphics" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.media" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.swing" />
+      <root url="jar://$PROJECT_DIR$/lib/src.zip!/javafx.web" />
+    </SOURCES>
+  </library>
+</component>
