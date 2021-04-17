@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class DbHandler {
-    private static final String CON_STR = "jdbc:sqlite:C:/Users/sanor/IdeaProjects/CourseProjectsManager/src/model/DataBase";
+    private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\model\\DataBase";
     private static DbHandler instance = null;
     private Connection connection;
 
