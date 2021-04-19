@@ -25,3 +25,5 @@ out
 
 # Data files
 .idea/dataSources.xml
+
+.DS_Store
