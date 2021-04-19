@@ -16,8 +16,6 @@
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/sqlite-jdbc-3.8.10.1.jar!/" />
-      <root url="file://$PROJECT_DIR$/lib/jfx" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/lib/jfx" recursive="false" type="SOURCES" />
   </library>
 </component>
