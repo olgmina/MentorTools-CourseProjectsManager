@@ -475,9 +475,9 @@ public class Controller implements Initializable {
                     if (option.get() == ButtonType.OK) {
                         String curStat = student.getStatus();
                         String nextStat = student.getNextStatus();
-                        if (!curStat.trim().toLowerCase().equals(nextStat.trim().toLowerCase())) {
+                        if (!curStat.trim().equalsIgnoreCase(nextStat.trim())) {
                             student.setStatus(student.getNextStatusInt());
-                            if (!nextStat.trim().toLowerCase().equals("завершено")) {
+                            if (!nextStat.trim().equalsIgnoreCase("завершено")) {
                                 try {
                                     yandex.sendMessage(student.getEmailAddress(), student.getStage(), "Статус этапа '" + student.getStage() + "' изменен на '" + student.getStatus() + "'.");
                                 } catch (MessagingException e) {
@@ -486,7 +486,7 @@ public class Controller implements Initializable {
                             } else {
                                 String curStage = student.getStage();
                                 String nextStage = student.getNextStage();
-                                if (!curStage.trim().toLowerCase().equals(nextStage.trim().toLowerCase())) {
+                                if (!curStage.trim().equalsIgnoreCase(nextStage.trim())) {
                                     try {
                                         yandex.sendMessage(student.getEmailAddress(), student.getStage(), "Статус этапа '" + student.getStage() + "' изменен на '" + student.getStatus() + "'.\n" +
                                                 "Можете переходить на этап '" + nextStage + "'.");
