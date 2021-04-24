@@ -13,6 +13,7 @@
       <root url="jar://$PROJECT_DIR$/lib/sqlite-jdbc-3.8.10.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/javax.transaction.jar!/" />
       <root url="file://$PROJECT_DIR$/lib/javafx-sdk-11.0.2/lib" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.activation-1.2.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
