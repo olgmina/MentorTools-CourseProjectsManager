@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="796.0" prefWidth="1556.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1321.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Controller">
     <top>
         <MenuBar prefHeight="30.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Опции">
@@ -43,25 +32,25 @@
         </MenuBar>
     </top>
     <center>
-        <TableView fx:id="studentsTable" prefHeight="630.0" prefWidth="946.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="studentsTable" prefHeight="570.0" prefWidth="1013.0" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="ID" prefWidth="75.0" text="ID" />
                 <TableColumn fx:id="PERSONAL" prefWidth="118.00001525878906" text="PERSONAL" />
                 <TableColumn fx:id="EMAIL" prefWidth="150.0" text="EMAIL" />
                 <TableColumn fx:id="FOLDER" prefWidth="160.0" text="FOLDER" />
-                <TableColumn fx:id="STAGE" minWidth="0.0" prefWidth="210.0" text="STAGE" />
-                <TableColumn fx:id="STATUS" minWidth="0.0" prefWidth="161.0" text="STATUS" />
-                <TableColumn fx:id="FILES" minWidth="0.0" prefWidth="133.0" text="FILES" />
+                <TableColumn fx:id="STAGE" minWidth="0.0" prefWidth="150.4000244140625" text="STAGE" />
+                <TableColumn fx:id="STATUS" minWidth="0.0" prefWidth="158.5999755859375" text="STATUS" />
+                <TableColumn fx:id="FILES" minWidth="0.0" prefWidth="196.60003662109375" text="FILES" />
             </columns>
         </TableView>
     </center>
    <right>
-       <VBox prefHeight="764.0" prefWidth="547.0" BorderPane.alignment="CENTER">
-           <TextArea fx:id="textArea" prefHeight="544.0" prefWidth="547.0" />
+       <VBox prefHeight="570.0" prefWidth="309.0" BorderPane.alignment="CENTER">
+           <TextArea fx:id="textArea" prefHeight="351.0" prefWidth="422.0" />
            <GridPane alignment="CENTER" prefHeight="230.0" prefWidth="547.0">
                <columnConstraints>
-                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="99.0" />
-                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="608.0" minWidth="10.0" prefWidth="462.0" />
+                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="148.40000762939454" />
+                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="608.0" minWidth="10.0" prefWidth="273.99999237060547" />
                </columnConstraints>
                <rowConstraints>
                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
@@ -74,13 +63,25 @@
                    <font>
                        <Font size="18.0" />
                    </font>
+               <GridPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </GridPane.margin>
                </Label>
                <Label text="Кому" GridPane.rowIndex="1" />
                <Label text="Тема" GridPane.rowIndex="2" />
                <Label text="Сообщение" GridPane.rowIndex="3" />
-               <TextField fx:id="toEmail" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-               <TextField fx:id="themeStage" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-               <TextArea fx:id="message" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+               <TextField fx:id="toEmail" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </GridPane.margin></TextField>
+               <TextField fx:id="themeStage" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </GridPane.margin></TextField>
+               <TextArea fx:id="message" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </GridPane.margin></TextArea>
                <Button mnemonicParsing="false" onAction="#sendEmail" text="Отправить" GridPane.columnIndex="1" GridPane.rowIndex="4" />
            </GridPane>
        </VBox>
