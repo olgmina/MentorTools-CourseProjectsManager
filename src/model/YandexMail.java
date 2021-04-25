@@ -15,17 +15,6 @@ import java.util.Properties;
 
 public class YandexMail implements Mail {
 
-    private static String THEME_WRONG_STAGE = "Неверный выбор этапа";
-    private static String THEME_WRONG_FORMAT = "Прикрепленый файл имеет недопустимый формат";
-    private static String TEXT_STAGE_IS_ALREADY_COMPLETED = "Этап, указанный вами в сообщении, указан неверно. \n" +
-            "Вы уже завершили данный этап. \n" +
-            "Можете переходить к следующему этапу.";
-    private static String TEXT_YOU_HAVE_NOT_DONE_STAGE = "Этап, указанный вами в сообщении, указан неверно. \n" +
-            "Вы не завершили один из предыдущих этапов.";
-    private static String TEXT_WRONG_FORMAT = "Файл, который был прикрепен к сообщению имеет недопустимый формат. \n" +
-            "Допускаются форматы '.pdf, .docx, .doc, .txt, .c'.";
-    private static String TEXT_ANSWERED_ON_DATE = "Отвечено на сообщение, отправленное: ";
-
     private final String IMAP_host = "imap.yandex.ru";
 
     private String fromEmail;
