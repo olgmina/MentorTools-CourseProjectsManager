@@ -15,6 +15,13 @@ import java.util.Properties;
 
 public class YandexMail implements Mail {
 
+    private static String THEME_WRONG_STAGE                 = null;
+    private static String THEME_WRONG_FORMAT                = null;
+    private static String TEXT_STAGE_IS_ALREADY_COMPLETED   = null;
+    private static String TEXT_YOU_HAVE_NOT_DONE_STAGE      = null;
+    private static String TEXT_WRONG_FORMAT                 = null;
+    private static String TEXT_ANSWERED_ON_DATE             = null;
+
     private final String IMAP_host = "imap.yandex.ru";
 
     private String fromEmail;
@@ -26,6 +33,10 @@ public class YandexMail implements Mail {
         this.password = password;
         this.personal = personal;
         getInbox();
+    }
+
+    public void setAutoMessages(String[] messages) {
+        String[] messagesq = {"123","123"};
     }
 
     private Folder getInbox() throws MessagingException {
@@ -330,8 +341,8 @@ public class YandexMail implements Mail {
     }
 
     @Override
-    public SignIn getSignIn() {
-        return new SignIn(fromEmail, password, personal);
+    public SignInModel getSignIn() {
+        return new SignInModel(fromEmail, password, personal);
     }
 
     @Override

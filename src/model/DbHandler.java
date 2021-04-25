@@ -10,167 +10,227 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class DbHandler {
+
     private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\model\\DataBase";
     private static DbHandler instance = null;
     private Connection connection;
 
-    public static synchronized DbHandler getInstance() throws SQLException {
+    public static synchronized DbHandler getInstance() {
         if (instance == null)
             instance = new DbHandler();
         return instance;
     }
 
-    private DbHandler() throws SQLException {
-        DriverManager.registerDriver(new JDBC());
-        this.connection = DriverManager.getConnection(CON_STR);
-    }
-
-    Student getStudent(String emailAddress) {
-        try (Statement statement = this.connection.createStatement()) {
-            Student student = null;
-            ResultSet resultSet = statement.executeQuery("SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount FROM Student where emailAddress = '" + emailAddress + "'");
-            while (resultSet.next()) {
-                student = new Student(resultSet.getInt("id"),
-                        resultSet.getString("personal"),
-                        resultSet.getString("emailAddress"),
-                        resultSet.getString("folderPath"),
-                        resultSet.getInt("id_stage"),
-                        resultSet.getInt("id_status"),
-                        resultSet.getInt("fileCount"));
-            }
-            return student;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+    private DbHandler() {
+        try {
+            DriverManager.registerDriver(new JDBC());
+            this.connection = DriverManager.getConnection(CON_STR);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
-    public ObservableList<Student> getAllStudents() {
-        try (Statement statement = this.connection.createStatement()) {
-            ObservableList<Student> students = FXCollections.observableArrayList();
-            ResultSet resultSet = statement.executeQuery("SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount FROM Student");
-            while (resultSet.next()) {
-                students.add(new Student(resultSet.getInt("id"),
-                        resultSet.getString("personal"),
-                        resultSet.getString("emailAddress"),
-                        resultSet.getString("folderPath"),
-                        resultSet.getInt("id_stage"),
-                        resultSet.getInt("id_status"),
-                        resultSet.getInt("fileCount")));
-            }
-            return students;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return FXCollections.observableArrayList();
-        }
+    private ResultSet executeQuery(String sql) {
+        try {
+            Statement statement = this.connection.createStatement();
+            return statement.executeQuery(sql);
+        } catch (SQLException ignored) {}
+        return null;
     }
 
-    void addStudent(Student student) {
-        try (PreparedStatement statement = this.connection.prepareStatement(
-                "INSERT INTO Student(`personal`, `emailAddress`, `folderPath`, `id_stage`, `id_status`) " +
-                        "VALUES(?, ?, ?, ?, ?)")) {
-            statement.setObject(1, student.getPersonal());
-            statement.setObject(2, student.getEmailAddress());
-            statement.setObject(3, student.getFolderPath());
-            statement.setObject(4, student.getStageInt());
-            statement.setObject(5, student.getStatusInt());
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void executeUpdate(String sql) {
+        try {
+            Statement statement = this.connection.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException ignored) {}
     }
 
-    public void deleteStudent(String emailAddress) {
-        try (PreparedStatement statement = this.connection.prepareStatement(
-                "DELETE FROM Student WHERE emailAddress = ?")) {
-            statement.setObject(1, emailAddress);
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    /*---------------------------------------------------------
+    --------------Students-------------------------------------
+    ---------------------------------------------------------*/
+
+    public Student getStudent(String emailAddress) {
+        return getStudentFromResultSet(
+                executeQuery(
+                        "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
+                            "FROM Student " +
+                            "WHERE emailAddress = '" + emailAddress + "'"
+                )
+        );
+    }
+
+    public ObservableList<Student> getStudents() {
+        return getStudentsFromResultSet(
+                executeQuery(
+                        "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
+                            "FROM Student"
+                )
+        );
+    }
+
+    public void addStudent(Student student) {
+        executeUpdate(
+                "INSERT INTO Student(" +
+                        "personal, " +
+                        "emailAddress, " +
+                        "folderPath, " +
+                        "id_stage, " +
+                        "id_status" +
+                        ") " +
+                    "VALUES(" +
+                        student.getPersonal() + "," +
+                        student.getEmailAddress() + "," +
+                        student.getFolderPath() + "," +
+                        student.getStageInt() + "," +
+                        student.getStatusInt() +
+                        ")"
+        );
+    }
+
+    public void deleteStudent(int id) {
+        executeUpdate(
+                "DELETE FROM Student " +
+                    "WHERE id = " + id
+        );
     }
 
     public void updateStudent(Student student) {
-        try (PreparedStatement statement = this.connection.prepareStatement(
-                "UPDATE Student SET `personal` = ?, `folderPath` = ?, `id_stage` = ?, `id_status` = ?, fileCount = ? WHERE `emailAddress` = ?;")) {
-            statement.setObject(1, student.getPersonal());
-            statement.setObject(2, student.getFolderPath());
-            statement.setObject(3, student.getStageInt());
-            statement.setObject(4, student.getStatusInt());
-            statement.setObject(5, student.getFileCount());
-            statement.setObject(6, student.getEmailAddress());
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void signIn(SignIn user) {
-        clearSignIn();
-        try (PreparedStatement statement = this.connection.prepareStatement(
-                "INSERT INTO SignIn(`username`, `password`, `personal`) " +
-                        "VALUES(?, ?, ?)")) {
-            statement.setObject(1, user.getEmail());
-            statement.setObject(2, user.getPassword());
-            statement.setObject(3, user.getPersonal());
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void clearSignIn() {
-        try (PreparedStatement statement = this.connection.prepareStatement(
-                "DELETE FROM SignIn")) {
-            statement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean isLogged() {
-        ArrayList<PasswordAuthentication> login = new ArrayList<>();
-        try (Statement statement = this.connection.createStatement()) {
-            login = new ArrayList<>();
-            ResultSet resultSet = statement.executeQuery("SELECT username, password FROM SignIn");
-            while (resultSet.next()) {
-                login.add(new PasswordAuthentication(resultSet.getString("username"),
-                        resultSet.getString("password")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return login.size() > 0;
-    }
-
-    public SignIn getLogin() {
-        SignIn signIn = new SignIn();
-        try (Statement statement = this.connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery("SELECT username, password, personal FROM SignIn");
-            while (resultSet.next()) {
-                signIn.setEmail(resultSet.getString("username"));
-                signIn.setPassword(resultSet.getString("password"));
-                signIn.setPersonal(resultSet.getString("personal"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return signIn;
+        executeUpdate(
+                "UPDATE Student " +
+                    "SET " +
+                        "personal = '" + student.getPersonal() + "', " +
+                        "folderPath = '" + student.getFolderPath() + "', " +
+                        "id_stage = " + student.getStageInt() + ", " +
+                        "id_status = " + student.getStatusInt() + ", " +
+                        "fileCount = " + student.getFileCount() + " " +
+                    "WHERE `id` = " + student.getId()
+        );
     }
 
     public void changeDir(File file) {
-        ObservableList<Student> students = getAllStudents();
-        students.forEach(student -> {
-            try (PreparedStatement statement = this.connection.prepareStatement(
-                    "UPDATE Student SET `folderPath` = ? WHERE `emailAddress` = ?;")) {
-                statement.setObject(1, file.getPath() + "\\" + student.getEmailAddress());
-                statement.setObject(2, student.getEmailAddress());
-                statement.execute();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        getStudents().forEach(student -> executeUpdate(
+                "UPDATE Student " +
+                        "SET " +
+                        "folderPath = '" + file.getPath() + "\\" + student.getEmailAddress() + "' " +
+                        "WHERE id = " + student.getId()
+                )
+        );
     }
+
+    private Student getStudentFromResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                return new Student(
+                        resultSet.getInt("id"),
+                        resultSet.getString("personal"),
+                        resultSet.getString("emailAddress"),
+                        resultSet.getString("folderPath"),
+                        resultSet.getInt("id_stage"),
+                        resultSet.getInt("id_status"),
+                        resultSet.getInt("fileCount")
+                );
+            } catch (SQLException ignored) {}
+        }
+        return null;
+    }
+
+    private ObservableList<Student> getStudentsFromResultSet(ResultSet resultSet) {
+        ObservableList<Student> students = FXCollections.observableArrayList();
+        if (resultSet != null) {
+            try {
+                while (resultSet.next()) students.add(getStudentFromResultSet(resultSet));
+                if (!students.isEmpty()) return students;
+            } catch (SQLException ignored) {}
+        }
+        return null;
+    }
+
+    /*---------------------------------------------------------
+    --------------SignIn---------------------------------------
+    ---------------------------------------------------------*/
+
+    public void addSignIn(SignInModel user) {
+        clearSignIn();
+        executeUpdate(
+                "INSERT INTO SignIn(" +
+                        "username, " +
+                        "password, " +
+                        "personal " +
+                        ") " +
+                        "VALUES(" +
+                        user.getEmail() + "," +
+                        user.getPassword() + "," +
+                        user.getPersonal() +
+                        ")"
+        );
+    }
+
+    public void clearSignIn() {
+        executeUpdate(
+                "DELETE " +
+                    "FROM SignIn"
+        );
+    }
+
+    public boolean isLogged() {
+        return getSignIn() != null;
+    }
+
+    public SignInModel getSignIn() {
+        return getSignInFromResultSet(
+                executeQuery(
+                        "SELECT id, username, password, personal " +
+                                "FROM SignIn"
+                )
+        );
+    }
+
+    private SignInModel getSignInFromResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                return new SignInModel(
+                        resultSet.getString("username"),
+                        resultSet.getString("passwords"),
+                        resultSet.getString("personal")
+                );
+            } catch (SQLException ignored) {}
+        }
+        return null;
+    }
+
+    /*---------------------------------------------------------
+    --------------Auto_Messages--------------------------------
+    ---------------------------------------------------------*/
+
+    public AutoMessagesModel getAutoMessage(String name) {
+        return getAutoMessageFromResultSet(
+                executeQuery(
+                        "SELECT message_name, message_text " +
+                            "FROM Auto_message " +
+                            "WHERE message_name = '" + name + "'"
+                )
+        );
+    }
+
+    public void updateAutoMessage(AutoMessagesModel autoMessage) {
+        executeUpdate(
+                "UPDATE Auto_messages " +
+                    "SET " +
+                    "message_text = " + autoMessage.getText() + " " +
+                    "WHERE message_name = " + autoMessage.getName()
+        );
+    }
+
+    private AutoMessagesModel getAutoMessageFromResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                return new AutoMessagesModel(
+                        resultSet.getString("message_name"),
+                        resultSet.getString("message_text")
+                );
+            } catch (SQLException ignored) {}
+        }
+        return null;
+    }
+
 }

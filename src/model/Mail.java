@@ -15,6 +15,6 @@ public interface Mail {
     void deleteInboxDialogMessages(String emailTo);
     void loadNotSeenInboxMessage(DbHandler dataBase, File rootFolder);
     void messagesSetSeen();
-    SignIn getSignIn();
+    SignInModel getSignIn();
     String getFromEmail();
 }

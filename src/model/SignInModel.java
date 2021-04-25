@@ -1,18 +1,18 @@
 package model;
 
-public class SignIn {
+public class SignInModel {
 
     private String email;
     private String password;
     private String personal;
 
-    public SignIn(String email, String password, String personal) {
+    public SignInModel(String email, String password, String personal) {
         this.email = email;
         this.password = password;
         this.personal = personal;
     }
 
-    SignIn() {
+    SignInModel() {
         email = "unknown@yandex.ru";
         password = "password";
         personal = "unknown";

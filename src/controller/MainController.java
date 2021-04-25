@@ -1,9 +1,11 @@
 package controller;
 
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class MainController implements Initializable {
     public TextArea textArea;
     public TableView<Student> studentsTable;
     public TableColumn<Student, Integer> ID;
@@ -66,17 +68,13 @@ public class Controller implements Initializable {
         });
 
         textArea.setEditable(false);
-        try {
-            dataBase = DbHandler.getInstance();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        dataBase = DbHandler.getInstance();
 
         signIn = dataBase.isLogged();
         if (!signIn)
             yandexLoginWindow();
         else {
-            SignIn user = dataBase.getLogin();
+            SignInModel user = dataBase.getSignIn();
             try {
                 yandex = new YandexMail(user.getEmail(), user.getPassword(), user.getPersonal());
             } catch (MessagingException e) {
@@ -86,8 +84,7 @@ public class Controller implements Initializable {
             }
         }
 
-        studentsTable.getItems().clear();
-        students = dataBase.getAllStudents();
+        students = dataBase.getStudents();
         ID.setCellValueFactory(new PropertyValueFactory<>("id"));
         PERSONAL.setCellValueFactory(new PropertyValueFactory<>("personal"));
         EMAIL.setCellValueFactory(new PropertyValueFactory<>("emailAddress"));
@@ -290,9 +287,9 @@ public class Controller implements Initializable {
 
             btn.setOnAction(e -> {
                 try {
-                    SignIn user = new SignIn(userTextField.getText() + yandexRu.getText(), pwBox.getText(), personalTextField.getText());
+                    SignInModel user = new SignInModel(userTextField.getText() + yandexRu.getText(), pwBox.getText(), personalTextField.getText());
                     yandex = new YandexMail(user.getEmail(), user.getPassword(), user.getPersonal());
-                    dataBase.signIn(yandex.getSignIn());
+                    dataBase.addSignIn(yandex.getSignIn());
                     signIn = true;
                     loginWindow.close();
                     newAlert(Alert.AlertType.INFORMATION, "Информация", "Вы успешно вошли в почтовый аккаунт");
@@ -368,9 +365,9 @@ public class Controller implements Initializable {
     }
 
     public void showAllStudents() {
-        studentsTable.getItems().clear();
-        students = dataBase.getAllStudents();
-        if (students.isEmpty())
+        //studentsTable.getItems().clear();
+        students = dataBase.getStudents();
+        if (students == null)
             newAlert(Alert.AlertType.INFORMATION, "Инфортация", "В базе данных нет студентов.");
         else
             studentsTable.setItems(students);
@@ -422,7 +419,7 @@ public class Controller implements Initializable {
                 if (option2.get() == ButtonType.OK)
                     yandex.deleteInboxDialogMessages(student.getEmailAddress());
             if (new File(student.getFolderPath()).exists() && yandex.getInboxDialogMessages(student.getEmailAddress()).isEmpty()) {
-                dataBase.deleteStudent(student.getEmailAddress());
+                dataBase.deleteStudent(student.getId());
                 showAllStudents();
             }
         } else {
@@ -545,95 +542,11 @@ public class Controller implements Initializable {
             yandexLoginWindow();
     }
 
-    public void changeConstants() {
-        GridPane grid = newGridScene(1000, 720, 2, 9, 100);
-        grid.getRowConstraints().clear();
-        grid.getRowConstraints().add(new RowConstraints(50, -1, -1, Priority.SOMETIMES, VPos.CENTER, true));
-        grid.getRowConstraints().add(new RowConstraints(50, 50, 50, Priority.SOMETIMES, VPos.CENTER, true));
-        grid.getRowConstraints().add(new RowConstraints(50, 50, 50, Priority.SOMETIMES, VPos.CENTER, true));
-        for (int i = 0; i < 4; i++)
-            grid.getRowConstraints().add(new RowConstraints(100, 100, 100, Priority.SOMETIMES, VPos.CENTER, true));
-        grid.getRowConstraints().add(new RowConstraints(30, 30, 30, Priority.SOMETIMES, VPos.CENTER, true));
-        grid.getRowConstraints().add(new RowConstraints(15, 15, 15, Priority.SOMETIMES, VPos.CENTER, true));
-
-        Scene autoMessages = new Scene(grid, grid.getPrefWidth(), grid.getPrefHeight());
-
-        Text sceneTitle = new Text("Здесь вы можете изменить темы и сообщения автоматических ответов студентам");
-        sceneTitle.setTextAlignment(TextAlignment.CENTER);
-        sceneTitle.setWrappingWidth(300);
-        sceneTitle.setFont(new Font(18));
-
-        grid.add(sceneTitle, 1, 0);
-
-        Label THEME_WRONG_STAGE = new Label("Неверный выбор этапа (тема): ");
-        THEME_WRONG_STAGE.setPrefHeight(50);
-        grid.add(THEME_WRONG_STAGE, 0, 1);
-
-        TextField THEME_WRONG_STAGE1 = new TextField();
-        THEME_WRONG_STAGE1.setText(YandexMail.getThemeWrongStage());
-        grid.add(THEME_WRONG_STAGE1, 1, 1);
-
-        Label THEME_WRONG_FORMAT = new Label("Неверный формат (тема): ");
-        THEME_WRONG_FORMAT.setPrefHeight(50);
-        grid.add(THEME_WRONG_FORMAT, 0, 2);
-
-        TextField THEME_WRONG_FORMAT1 = new TextField();
-        THEME_WRONG_FORMAT1.setText(YandexMail.getThemeWrongFormat());
-        grid.add(THEME_WRONG_FORMAT1, 1, 2);
-
-        Label TEXT_STAGE_IS_ALREADY_COMPLETED = new Label("Этап уже завершен (текст): ");
-        TEXT_STAGE_IS_ALREADY_COMPLETED.setPrefHeight(100);
-        grid.add(TEXT_STAGE_IS_ALREADY_COMPLETED, 0, 3);
-
-        TextArea TEXT_STAGE_IS_ALREADY_COMPLETED1 = new TextArea();
-        TEXT_STAGE_IS_ALREADY_COMPLETED1.setText(YandexMail.getTextStageIsAlreadyCompleted());
-        grid.add(TEXT_STAGE_IS_ALREADY_COMPLETED1, 1, 3);
-
-        Label TEXT_YOU_HAVE_NOT_DONE_STAGE = new Label("Не завершен один из предыдущих этапов (текст): ");
-        TEXT_YOU_HAVE_NOT_DONE_STAGE.setPrefHeight(100);
-        grid.add(TEXT_YOU_HAVE_NOT_DONE_STAGE, 0, 4);
-
-        TextArea TEXT_YOU_HAVE_NOT_DONE_STAGE1 = new TextArea();
-        TEXT_YOU_HAVE_NOT_DONE_STAGE1.setText(YandexMail.getTextYouHaveNotDoneStage());
-        grid.add(TEXT_YOU_HAVE_NOT_DONE_STAGE1, 1, 4);
-
-        Label TEXT_WRONG_FORMAT = new Label("Неверный формат (текст): ");
-        TEXT_WRONG_FORMAT.setPrefHeight(100);
-        grid.add(TEXT_WRONG_FORMAT, 0, 5);
-
-        TextArea TEXT_WRONG_FORMAT1 = new TextArea();
-        TEXT_WRONG_FORMAT1.setText(YandexMail.getTextWrongFormat());
-        grid.add(TEXT_WRONG_FORMAT1, 1, 5);
-
-        Label TEXT_ANSWERED_ON_DATE = new Label("Приписка после сообщения (ответ на + дата): ");
-        TEXT_ANSWERED_ON_DATE.setPrefHeight(100);
-        grid.add(TEXT_ANSWERED_ON_DATE, 0, 6);
-
-        TextArea TEXT_ANSWERED_ON_DATE1 = new TextArea();
-        TEXT_ANSWERED_ON_DATE1.setText(YandexMail.getTextAnsweredOnDate());
-        grid.add(TEXT_ANSWERED_ON_DATE1, 1, 6);
-
-        Button btn = new Button("Изменить");
-        grid.add(btn, 1, 7);
-
-        Stage changeConstants = new Stage();
-        changeConstants.setTitle("Изменение автоматических сообщений");
-        changeConstants.setScene(autoMessages);
-        changeConstants.setResizable(false);
-
-        btn.setOnAction(e -> {
-            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы действительно хотите изменить текст и темы автоматических сообщений?");
-            if (option.isPresent())
-                if (option.get() == ButtonType.OK) {
-                    YandexMail.setTextAnsweredOnDate(TEXT_ANSWERED_ON_DATE1.getText());
-                    YandexMail.setTextStageIsAlreadyCompleted(TEXT_STAGE_IS_ALREADY_COMPLETED1.getText());
-                    YandexMail.setTextWrongFormat(TEXT_WRONG_FORMAT1.getText());
-                    YandexMail.setTextYouHaveNotDoneStage(TEXT_YOU_HAVE_NOT_DONE_STAGE1.getText());
-                    YandexMail.setThemeWrongFormat(THEME_WRONG_FORMAT1.getText());
-                    YandexMail.setThemeWrongStage(THEME_WRONG_STAGE1.getText());
-                    changeConstants.close();
-                }
-        });
-        changeConstants.showAndWait();
+    public void changeConstants() throws IOException {
+        Stage primaryStage = new Stage();
+        Parent root = FXMLLoader.load(getClass().getResource("../view/autoMessagesView.fxml"));
+        primaryStage.setTitle("Auto-messages");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
     }
 }
