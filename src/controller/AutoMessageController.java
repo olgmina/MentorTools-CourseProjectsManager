@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.*;
 
 
-public class AutoMessagesController implements Initializable {
+public class AutoMessageController implements Initializable {
 
     public TextArea THEME_WRONG_STAGE;
     public TextArea THEME_WRONG_FORMAT;

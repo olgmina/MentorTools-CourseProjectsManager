@@ -206,7 +206,7 @@ public class DbHandler {
         return getAutoMessageFromResultSet(
                 executeQuery(
                         "SELECT id, message_name, message_text " +
-                            "FROM Auto_messages " +
+                            "FROM Auto_message " +
                             "WHERE message_name = '" + name + "'"
                 )
         );
@@ -214,10 +214,10 @@ public class DbHandler {
 
     public void updateAutoMessage(AutoMessageEntity autoMessage) {
         executeUpdate(
-                "UPDATE Auto_messages " +
+                "UPDATE Auto_message " +
                     "SET " +
                     "message_text = '" + autoMessage.getText() + "' " +
-                    "WHERE message_name = '" + autoMessage.getName() + "'"
+                    "WHERE id = " + autoMessage.getId() + ""
         );
     }
 
