@@ -1,11 +1,15 @@
 package controller;
 
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import model.AutoMessageEntity;
+import model.AutoMessageModel;
 import model.DbHandler;
 
+import java.awt.*;
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
 
 
 public class AutoMessagesController implements Initializable {
@@ -16,12 +20,32 @@ public class AutoMessagesController implements Initializable {
     public TextArea TEXT_WRONG_FORMAT;
     public TextArea TEXT_STAGE_IS_ALREADY_COMPLETED;
     public TextArea TEXT_ANSWERED_ON_DATE;
+    public AutoMessageModel autoMessageModel = new AutoMessageModel();
+    public Map<String, TextArea> textAreaStringMap = new HashMap<>();
+    public Label message;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        DbHandler dbHandler = DbHandler.getInstance();
+        textAreaStringMap.put(AutoMessageModel.THEME_WRONG_STAGE, THEME_WRONG_STAGE);
+        textAreaStringMap.put(AutoMessageModel.THEME_WRONG_FORMAT, THEME_WRONG_FORMAT);
+        textAreaStringMap.put(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE, TEXT_YOU_HAVE_NOT_DONE_STAGE);
+        textAreaStringMap.put(AutoMessageModel.TEXT_WRONG_FORMAT, TEXT_WRONG_FORMAT);
+        textAreaStringMap.put(AutoMessageModel.TEXT_STAGE_IS_ALREADY_COMPLETED, TEXT_STAGE_IS_ALREADY_COMPLETED);
+        textAreaStringMap.put(AutoMessageModel.TEXT_ANSWERED_ON_DATE, TEXT_ANSWERED_ON_DATE);
+        textAreaStringMap.forEach(
+                (name, textArea) -> textArea.setText(autoMessageModel.getAutoMessage(name).getText())
+        );
     }
 
     public void saveAction() {
+        textAreaStringMap.forEach(
+                (name, textArea) -> {
+                    AutoMessageEntity autoMessage = autoMessageModel.getAutoMessage(name);
+                    autoMessage.setText(textArea.getText());
+                    autoMessageModel.saveAutoMessage(autoMessage);
+                }
+        );
+        message.setText("Данные успешно сохранены");
+        message.setStyle("-fx-text-fill: green;");
     }
 }
