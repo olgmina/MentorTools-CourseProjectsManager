@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -542,11 +543,17 @@ public class MainController implements Initializable {
             yandexLoginWindow();
     }
 
-    public void changeConstants() throws IOException {
-        Stage primaryStage = new Stage();
-        Parent root = FXMLLoader.load(getClass().getResource("../view/autoMessagesView.fxml"));
-        primaryStage.setTitle("Auto-messages");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+    public void changeAutoMessages() {
+        showScene("../view/autoMessagesView.fxml", "Auto-messages");
+    }
+
+    public void showScene(String resourceFXML, String sceneTitle) {
+        try {
+            Stage primaryStage = new Stage();
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourceFXML)));
+            primaryStage.setTitle(sceneTitle);
+            primaryStage.setScene(new Scene(root));
+            primaryStage.show();
+        } catch (IOException exception) { newAlert(Alert.AlertType.ERROR, "Ошибка", "Что-то пошло не так"); }
     }
 }

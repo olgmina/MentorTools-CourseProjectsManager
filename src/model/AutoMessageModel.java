@@ -1,6 +1,6 @@
 package model;
 
-public class AutoMessagesModel {
+public class AutoMessageModel extends BaseModel{
 
     public static final String THEME_WRONG_STAGE                 = "THEME_WRONG_STAGE";
     public static final String THEME_WRONG_FORMAT                = "THEME_WRONG_FORMAT";
@@ -9,19 +9,12 @@ public class AutoMessagesModel {
     public static final String TEXT_WRONG_FORMAT                 = "TEXT_WRONG_FORMAT";
     public static final String TEXT_ANSWERED_ON_DATE             = "TEXT_ANSWERED_ON_DATE";
 
-    private String name;
-    private String text;
-
-    public AutoMessagesModel(String name, String text) {
-        this.name = name;
-        this.text = text;
+    public AutoMessageEntity getAutoMessage(String name) {
+        return dbHandler.getAutoMessage(name);
     }
 
-    public String getName() {
-        return name;
+    public void saveAutoMessage(AutoMessageEntity autoMessage) {
+        dbHandler.updateAutoMessage(autoMessage);
     }
 
-    public String getText() {
-        return text;
-    }
 }

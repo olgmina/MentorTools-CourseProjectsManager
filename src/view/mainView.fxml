@@ -18,7 +18,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#inboxCount" text="Количество входящих сообщений" />
                 <MenuItem mnemonicParsing="false" onAction="#inboxNotSeenCount" text="Количество непрочитанных сообщений" />
                 <MenuItem mnemonicParsing="false" onAction="#showNotSeenMessages" text="Просмотреть непрочитанные сообщения" />
-                <MenuItem mnemonicParsing="false" onAction="#changeConstants" text="Авто-сообщения" />
+                <MenuItem mnemonicParsing="false" onAction="#changeAutoMessages" text="Авто-сообщения" />
                 <MenuItem mnemonicParsing="false" onAction="#loadNotSeenMessages" text="Скачать новые сообщения" />
                 <MenuItem mnemonicParsing="false" onAction="#getDialogWithStudent" text="Просмотреть цепочку писем с выбранным студентом" />
             </Menu>
