@@ -1,27 +1,12 @@
-package controller;
+package controllers;
 
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
-import model.*;
+import models.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -30,13 +15,11 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable {
+public class MainController extends BaseController implements Initializable {
     public TextArea textArea;
     public TableView<Student> studentsTable;
     public TableColumn<Student, Integer> ID;
@@ -71,19 +54,7 @@ public class MainController implements Initializable {
         textArea.setEditable(false);
         dataBase = DbHandler.getInstance();
 
-        signIn = dataBase.isLogged();
-        if (!signIn)
-            yandexLoginWindow();
-        else {
-            SignInModel user = dataBase.getSignIn();
-            try {
-                yandex = new YandexMail(user.getEmail(), user.getPassword(), user.getPersonal());
-            } catch (MessagingException e) {
-                newAlert(Alert.AlertType.ERROR, "Ошибка", "Нестабильное интернет соединение\n" +
-                        "или неверно был ввелен логин или пароль");
-                signIn = false;
-            }
-        }
+        changeUser();
 
         students = dataBase.getStudents();
         ID.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -96,85 +67,11 @@ public class MainController implements Initializable {
         studentsTable.setItems(students);
     }
 
-    private void newPersonalWindow(Student student) {
-        GridPane grid = newGridScene(400, 150, 3, 3, 30);
-
-        Scene personal = new Scene(grid, grid.getPrefWidth(), grid.getPrefHeight());
-
-        Text sceneTitle = new Text("Введите новые данные");
-        sceneTitle.setTextAlignment(TextAlignment.CENTER);
-        sceneTitle.setWrappingWidth(200);
-        sceneTitle.setFont(new Font(18));
-        grid.add(sceneTitle, 1, 0);
-
-        Label personalLbl = new Label("Введите ФИО:");
-        grid.add(personalLbl, 0, 1);
-
-        TextField personalTextField = new TextField();
-        grid.add(personalTextField, 1, 1);
-
-        Button btn = new Button("Изменить");
-        grid.add(btn, 2, 3);
-
-        Stage loginWindow = new Stage();
-        loginWindow.setTitle("Вход");
-        loginWindow.setScene(personal);
-        loginWindow.setResizable(false);
-        loginWindow.setOnCloseRequest(event -> signIn = false);
-
-        btn.setOnAction(e -> {
-            if (!personalTextField.getText().isEmpty()) {
-                student.setPersonal(personalTextField.getText());
-                dataBase.updateStudent(student);
-                loginWindow.close();
-                newAlert(Alert.AlertType.INFORMATION, "Информация", "Вы успешно изменили ФИО студента");
-                showAllStudents();
-            } else {
-                newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не ввели ФИО");
-            }
-        });
-        loginWindow.showAndWait();
-    }
-
-    private Optional<ButtonType> newAlert(Alert.AlertType alertType, String title, String contentText) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(contentText);
-        return alert.showAndWait();
-    }
-
-    private GridPane newGridScene(double gridWidth, double gridHeight, int colsCount, int rowsCount, double rowHeight) {
-        GridPane grid = new GridPane();
-        grid.setPrefHeight(gridHeight);
-        grid.setMaxHeight(gridHeight);
-        grid.setMinHeight(gridHeight);
-        grid.setPrefWidth(gridWidth);
-        grid.setMaxWidth(gridWidth);
-        grid.setMinWidth(gridWidth);
-        grid.setVgap(5);
-        grid.setHgap(5);
-        if (colsCount == 3) {
-            grid.getColumnConstraints().add(new ColumnConstraints(gridWidth / 4, gridWidth / 4, gridWidth / 4, Priority.SOMETIMES, HPos.RIGHT, true));
-            grid.getColumnConstraints().add(new ColumnConstraints(gridWidth / 2, gridWidth / 2, gridWidth / 2, Priority.SOMETIMES, HPos.CENTER, true));
-            grid.getColumnConstraints().add(new ColumnConstraints(gridWidth / 4, gridWidth / 4, gridWidth / 4, Priority.SOMETIMES, HPos.LEFT, true));
-        }
-        else if (colsCount == 2) {
-            grid.getColumnConstraints().add(new ColumnConstraints(gridWidth * 0.4, gridWidth * 0.4, gridWidth * 0.4, Priority.SOMETIMES, HPos.RIGHT, true));
-            grid.getColumnConstraints().add(new ColumnConstraints(gridWidth * 0.6, gridWidth * 0.6, gridWidth * 0.6, Priority.SOMETIMES, HPos.LEFT, true));
-        }
-        if (rowsCount >= 3) {
-            grid.getRowConstraints().add(new RowConstraints(50, -1, -1, Priority.SOMETIMES, VPos.CENTER, true));
-            for (int i = 0; i < rowsCount - 2; i++) {
-                grid.getRowConstraints().add(new RowConstraints(rowHeight, rowHeight, rowHeight, Priority.SOMETIMES, VPos.CENTER, true));
-            }
-            grid.getRowConstraints().add(new RowConstraints(15, 15, 15, Priority.SOMETIMES, VPos.CENTER, true));
-        }
-        return grid;
-    }
+    //TODO: изменять пенсональные данные
+    private void newPersonalWindow(Student student) {}
 
     private void chooseStageForDialog(Student student) {
-        GridPane grid = newGridScene(600, 150,3, 4, 30);
+        /*GridPane grid = newGridScene(600, 150,3, 4, 30);
 
         Scene chooseStage = new Scene(grid, grid.getPrefWidth(), grid.getPrefHeight());
 
@@ -226,7 +123,7 @@ public class MainController implements Initializable {
                 newAlert(Alert.AlertType.INFORMATION, "Информация", "Диалог пуст");
             stageWindow.close();
         });
-        stageWindow.showAndWait();
+        stageWindow.showAndWait();*/
     }
 
     private boolean deleteDirectory(File path) {
@@ -243,74 +140,8 @@ public class MainController implements Initializable {
         return (path.delete());
     }
 
-    public void yandexLoginWindow() {
-        if (!signIn) {
-            GridPane grid = newGridScene(600, 200, 3, 6, 30);
-
-            Scene login = new Scene(grid, grid.getPrefWidth(), grid.getPrefHeight());
-
-            Text sceneTitle = new Text("Войти в почтовый аккаунт");
-            sceneTitle.setTextAlignment(TextAlignment.CENTER);
-            sceneTitle.setWrappingWidth(200);
-            sceneTitle.setFont(new Font(18));
-
-            grid.add(sceneTitle, 1, 0);
-
-            Label userName = new Label("Username:");
-            grid.add(userName, 0, 1);
-
-            TextField userTextField = new TextField();
-            grid.add(userTextField, 1, 1);
-
-            Label yandexRu = new Label("@yandex.ru");
-            grid.add(yandexRu, 2, 1);
-
-            Label personal = new Label("Фамилия и Имя:");
-            grid.add(personal, 0, 2);
-
-            TextField personalTextField = new TextField();
-            grid.add(personalTextField, 1, 2);
-
-            Label pw = new Label("Password:");
-            grid.add(pw, 0, 3);
-
-            PasswordField pwBox = new PasswordField();
-            grid.add(pwBox, 1, 3);
-
-            Button btn = new Button("Войти");
-            grid.add(btn, 2, 4);
-
-            Stage loginWindow = new Stage();
-            loginWindow.setTitle("Вход");
-            loginWindow.setScene(login);
-            loginWindow.setResizable(false);
-            loginWindow.setOnCloseRequest(event -> signIn = false);
-
-            btn.setOnAction(e -> {
-                try {
-                    SignInModel user = new SignInModel(userTextField.getText() + yandexRu.getText(), pwBox.getText(), personalTextField.getText());
-                    yandex = new YandexMail(user.getEmail(), user.getPassword(), user.getPersonal());
-                    dataBase.addSignIn(yandex.getSignIn());
-                    signIn = true;
-                    loginWindow.close();
-                    newAlert(Alert.AlertType.INFORMATION, "Информация", "Вы успешно вошли в почтовый аккаунт");
-                } catch (MessagingException ex) {
-                    signIn = false;
-                    newAlert(Alert.AlertType.ERROR, "Ошибка", "Неверный логин / пароль\n" +
-                            "или нестабильное интернет соединение");
-                }
-            });
-            loginWindow.showAndWait();
-        } else {
-            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы уже вошли в аккаут электронной почты.\n" +
-                    "Вы уверены, что хотите сменить пользователя?");
-            if (option.isPresent())
-                if (option.get() == ButtonType.OK) {
-                    dataBase.clearSignIn();
-                    signIn = dataBase.isLogged();
-                    yandexLoginWindow();
-                }
-        }
+    public void changeUser() {
+        showScene("../view/UserView.fxml", "Sign in");
     }
 
     public void close() {
@@ -325,14 +156,14 @@ public class MainController implements Initializable {
             newAlert(Alert.AlertType.INFORMATION, "Информация", "У вас " + yandex.inboxMessagesCount() + " входящих сообщений.\n" +
                     "Из них " + yandex.notSeenMessagesCount() + " непрочитанных.");
         else
-            yandexLoginWindow();
+            changeUser();
     }
 
     public void inboxNotSeenCount() {
         if (signIn)
             newAlert(Alert.AlertType.INFORMATION, "Информация", "У вас " + yandex.notSeenMessagesCount() + " непрочитанных сообщений");
         else
-            yandexLoginWindow();
+            changeUser();
     }
 
     public void showNotSeenMessages() {
@@ -348,7 +179,7 @@ public class MainController implements Initializable {
                 newAlert(Alert.AlertType.ERROR, "Ошибка", "У вас нет непрочитанных сообщений\n" +
                         "или нестабильное интернет соединение");
         } else {
-            yandexLoginWindow();
+            changeUser();
         }
     }
 
@@ -361,7 +192,7 @@ public class MainController implements Initializable {
                         "или нестабильное интернет соединение");
             showAllStudents();
         } else {
-            yandexLoginWindow();
+            changeUser();
         }
     }
 
@@ -379,9 +210,8 @@ public class MainController implements Initializable {
             Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы уверены, что хотите выйти из почтового аккаунта?");
             if (option.isPresent())
                 if (option.get() == ButtonType.OK) {
-                    dataBase.clearSignIn();
                     signIn = dataBase.isLogged();
-                    yandexLoginWindow();
+                    changeUser();
                 }
         } else {
             newAlert(Alert.AlertType.INFORMATION, "Инфортация", "Вы не вошли в почтовый аккаунт");
@@ -516,7 +346,7 @@ public class MainController implements Initializable {
                 newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
             }
         } else
-            yandexLoginWindow();
+            changeUser();
     }
 
     public void changePersonal() {
@@ -540,20 +370,10 @@ public class MainController implements Initializable {
             } else
                 newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
         } else
-            yandexLoginWindow();
+            changeUser();
     }
 
     public void changeAutoMessages() {
-        showScene("../view/autoMessagesView.fxml", "Auto-messages");
-    }
-
-    public void showScene(String resourceFXML, String sceneTitle) {
-        try {
-            Stage primaryStage = new Stage();
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourceFXML)));
-            primaryStage.setTitle(sceneTitle);
-            primaryStage.setScene(new Scene(root));
-            primaryStage.show();
-        } catch (IOException exception) { newAlert(Alert.AlertType.ERROR, "Ошибка", "Что-то пошло не так"); }
+        showScene("../view/AutoMessagesView.fxml", "Auto-messages");
     }
 }

@@ -1,4 +1,4 @@
-package model;
+package models;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -15,6 +15,5 @@ public interface Mail {
     void deleteInboxDialogMessages(String emailTo);
     void loadNotSeenInboxMessage(DbHandler dataBase, File rootFolder);
     void messagesSetSeen();
-    SignInModel getSignIn();
     String getFromEmail();
 }

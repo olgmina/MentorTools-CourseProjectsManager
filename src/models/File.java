@@ -1,4 +1,4 @@
-package model;
+package models;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;

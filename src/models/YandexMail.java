@@ -1,4 +1,4 @@
-package model;
+package models;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -101,7 +101,7 @@ public class YandexMail implements Mail {
         try {
             mp = (MimeMultipart) message.getContent();
             for (int i = 0; i < mp.getCount(); i++) {
-                model.File file = EmailMessageReader.getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
+                models.File file = EmailMessageReader.getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
                 if (file != null) {
                     if (file.getFileName().contains(".pdf")
                             || file.getFileName().contains(".docx")
@@ -338,11 +338,6 @@ public class YandexMail implements Mail {
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) message.setFlag(Flags.Flag.SEEN, true);
         } catch (MessagingException ignored) { }
-    }
-
-    @Override
-    public SignInModel getSignIn() {
-        return new SignInModel(fromEmail, password, personal);
     }
 
     @Override

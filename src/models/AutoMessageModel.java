@@ -1,4 +1,6 @@
-package model;
+package models;
+
+import entities.AutoMessageEntity;
 
 public class AutoMessageModel extends BaseModel{
 

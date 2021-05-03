@@ -1,17 +1,17 @@
-package model;
+package models;
 
+import entities.AutoMessageEntity;
+import entities.UserEntity;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.sqlite.JDBC;
 
-import javax.mail.PasswordAuthentication;
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class DbHandler {
 
-    private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\model\\DataBase";
+    private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\resources\\DataBase";
     private static DbHandler instance = null;
     private Connection connection;
 
@@ -149,35 +149,8 @@ public class DbHandler {
     --------------SignIn---------------------------------------
     ---------------------------------------------------------*/
 
-    public void addSignIn(SignInModel user) {
-        clearSignIn();
-        executeUpdate(
-                "INSERT INTO SignIn(" +
-                        "username, " +
-                        "password, " +
-                        "personal " +
-                        ") " +
-                        "VALUES(" +
-                        user.getEmail() + "," +
-                        user.getPassword() + "," +
-                        user.getPersonal() +
-                        ")"
-        );
-    }
-
-    public void clearSignIn() {
-        executeUpdate(
-                "DELETE " +
-                    "FROM SignIn"
-        );
-    }
-
-    public boolean isLogged() {
-        return getSignIn() != null;
-    }
-
-    public SignInModel getSignIn() {
-        return getSignInFromResultSet(
+    public UserEntity getUser() {
+        return getUserFromResultSet(
                 executeQuery(
                         "SELECT id, username, password, personal " +
                                 "FROM SignIn"
@@ -185,10 +158,30 @@ public class DbHandler {
         );
     }
 
-    private SignInModel getSignInFromResultSet(ResultSet resultSet) {
+    public void insertUser(UserEntity user) {
+        clearUser();
+        executeUpdate(
+                "INSERT INTO SignIn(username, password, personal) " +
+                    "VALUES(" + user.getUsername() + "," + user.getPassword() + "," + user.getPersonal() + ")"
+        );
+    }
+
+    public void clearUser() {
+        executeUpdate(
+                "DELETE " +
+                    "FROM SignIn"
+        );
+    }
+
+    public boolean isLogged() {
+        return getUser() != null;
+    }
+
+    private UserEntity getUserFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new SignInModel(
+                return new UserEntity(
+                        resultSet.getInt("id"),
                         resultSet.getString("username"),
                         resultSet.getString("passwords"),
                         resultSet.getString("personal")
@@ -233,5 +226,4 @@ public class DbHandler {
         }
         return null;
     }
-
 }

@@ -1,4 +1,4 @@
-package model;
+package models;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;

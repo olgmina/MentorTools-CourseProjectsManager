@@ -1,18 +1,16 @@
-package controller;
+package controllers;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import model.AutoMessageEntity;
-import model.AutoMessageModel;
-import model.DbHandler;
+import entities.AutoMessageEntity;
+import models.AutoMessageModel;
 
-import java.awt.*;
 import java.net.URL;
 import java.util.*;
 
 
-public class AutoMessageController implements Initializable {
+public class AutoMessageController extends BaseController implements Initializable {
 
     public TextArea THEME_WRONG_STAGE;
     public TextArea THEME_WRONG_FORMAT;

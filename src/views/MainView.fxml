@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1321.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1321.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
     <top>
         <MenuBar prefHeight="30.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Опции">
@@ -13,7 +13,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#changeDir" text="Изменить директорию для скачивания файлов" />
             </Menu>
             <Menu mnemonicParsing="false" text="Яндекс почта">
-                <MenuItem mnemonicParsing="false" onAction="#yandexLoginWindow" text="Вход в почту" />
+                <MenuItem mnemonicParsing="false" onAction="#changeUser" text="Вход в почту" />
                 <MenuItem mnemonicParsing="false" onAction="#yandexQuit" text="Выйти из почты" />
                 <MenuItem mnemonicParsing="false" onAction="#inboxCount" text="Количество входящих сообщений" />
                 <MenuItem mnemonicParsing="false" onAction="#inboxNotSeenCount" text="Количество непрочитанных сообщений" />
