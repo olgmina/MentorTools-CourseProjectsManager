@@ -18,7 +18,7 @@ public class AutoMessageController extends BaseController implements Initializab
     public TextArea TEXT_WRONG_FORMAT;
     public TextArea TEXT_STAGE_IS_ALREADY_COMPLETED;
     public TextArea TEXT_ANSWERED_ON_DATE;
-    public AutoMessageModel autoMessageModel = new AutoMessageModel();
+    public AutoMessageModel autoMessageModel = AutoMessageModel.getInstance();
     public Map<String, TextArea> textAreaStringMap = new HashMap<>();
     public Label message;
 

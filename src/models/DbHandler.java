@@ -15,7 +15,7 @@ public class DbHandler {
     private static DbHandler instance = null;
     private Connection connection;
 
-    public static synchronized DbHandler getInstance() {
+    public static DbHandler getInstance() {
         if (instance == null)
             instance = new DbHandler();
         return instance;
@@ -41,8 +41,9 @@ public class DbHandler {
     private void executeUpdate(String sql) {
         try {
             Statement statement = this.connection.createStatement();
+            System.out.println(sql);
             statement.executeUpdate(sql);
-        } catch (SQLException ignored) {}
+        } catch (SQLException ignored) {System.out.println(ignored);}
     }
 
     /*---------------------------------------------------------
@@ -78,9 +79,9 @@ public class DbHandler {
                         "id_status" +
                         ") " +
                     "VALUES(" +
-                        student.getPersonal() + "," +
-                        student.getEmailAddress() + "," +
-                        student.getFolderPath() + "," +
+                        "'" + student.getPersonal() + "'," +
+                        "'" + student.getEmailAddress() + "'," +
+                        "'" + student.getFolderPath() + "'," +
                         student.getStageInt() + "," +
                         student.getStatusInt() +
                         ")"
@@ -161,15 +162,15 @@ public class DbHandler {
     public void insertUser(UserEntity user) {
         clearUser();
         executeUpdate(
-                "INSERT INTO SignIn(username, password, personal) " +
-                    "VALUES(" + user.getUsername() + "," + user.getPassword() + "," + user.getPersonal() + ")"
+                "INSERT INTO User(username, password, personal) " +
+                    "VALUES('" + user.getUsername() + "','" + user.getPassword() + "','" + user.getPersonal() + "')"
         );
     }
 
     public void clearUser() {
         executeUpdate(
                 "DELETE " +
-                    "FROM SignIn"
+                    "FROM User"
         );
     }
 

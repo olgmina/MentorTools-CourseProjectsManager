@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public abstract class BaseController {
 
-    protected Optional<ButtonType> newAlert(Alert.AlertType alertType, String title, String contentText) {
+    public Optional<ButtonType> newAlert(Alert.AlertType alertType, String title, String contentText) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -21,14 +21,16 @@ public abstract class BaseController {
         return alert.showAndWait();
     }
 
-    protected void showScene(String resourceFXML, String sceneTitle) {
+    public Stage getScene(String resourceFXML, String sceneTitle) {
         try {
             Stage primaryStage = new Stage();
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourceFXML)));
             primaryStage.setTitle(sceneTitle);
             primaryStage.setScene(new Scene(root));
-            primaryStage.show();
-        } catch (IOException exception) { newAlert(Alert.AlertType.ERROR, "Ошибка", "Что-то пошло не так"); }
+            return primaryStage;
+        } catch (IOException exception) {
+            newAlert(Alert.AlertType.ERROR, "Ошибка", "Что-то пошло не так");
+            return null;
+        }
     }
-
 }

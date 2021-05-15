@@ -10,6 +10,13 @@ public class AutoMessageModel extends BaseModel{
     public static final String TEXT_YOU_HAVE_NOT_DONE_STAGE      = "TEXT_YOU_HAVE_NOT_DONE_STAGE";
     public static final String TEXT_WRONG_FORMAT                 = "TEXT_WRONG_FORMAT";
     public static final String TEXT_ANSWERED_ON_DATE             = "TEXT_ANSWERED_ON_DATE";
+    private static AutoMessageModel instance = null;
+
+    public static synchronized AutoMessageModel getInstance() {
+        if (instance == null)
+            instance = new AutoMessageModel();
+        return instance;
+    }
 
     public AutoMessageEntity getAutoMessage(String name) {
         return dbHandler.getAutoMessage(name);

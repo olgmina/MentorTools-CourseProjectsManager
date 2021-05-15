@@ -1,5 +1,5 @@
 package models;
 
 public abstract class BaseModel {
-    DbHandler dbHandler = DbHandler.getInstance();
+    public static DbHandler dbHandler = DbHandler.getInstance();
 }
