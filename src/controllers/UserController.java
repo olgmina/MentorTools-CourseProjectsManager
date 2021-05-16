@@ -20,23 +20,24 @@ public class UserController extends BaseController implements Initializable {
     public TextField personal;
     public TextField password;
     public Label mailDomain;
-    public static YandexMailModel yandexMail = null;
+
+    public YandexMailModel yandexMail = null;
+    public static UserModel userModel        = UserModel.getInstance();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        UserModel.getInstance().clearUser();
+        userModel.clearUser();
     }
 
     public void signIn() {
-        UserEntity user = new UserEntity(0, username.getText() + mailDomain.getText().trim(), password.getText(), personal.getText());
-        UserModel.getInstance().clearUser();
-        UserModel.getInstance().insertUser(user);
+        userModel.clearUser();
+        userModel.insertUser(new UserEntity(0, username.getText() + mailDomain.getText().trim(), password.getText(), personal.getText()));
         try {
             yandexMail = YandexMailModel.getInstance();
-            newAlert(Alert.AlertType.INFORMATION, "Информация", "Вы успешно вошли в почтовый аккаунт");
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_LOGIN);
         } catch (MessagingException e) {
-            UserModel.getInstance().clearUser();
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Неверный логин / пароль \nили нестабильное интернет соединение");
+            userModel.clearUser();
+            newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
         }
     }
 

@@ -36,19 +36,18 @@ public class MainController extends BaseController implements Initializable {
     public TextField themeStage;
     public TextArea message;
 
-    private DataBaseModel dataBaseModel;
     private ObservableList<StudentEntity> students = null;
     private File rootFolder;
-    private final String ERROR                                 = "Ошибка";
-    private final String INFORMATION                           = "Информация";
-    private final String CONFIRMATION                          = "Подтверждение";
-    private final String ERROR_WRONG_LOGIN_OR_PASSWORD         = "Неверный логин / пароль \n или нестабильное интернет соединение";
-    private final String ERROR_NO_UNREAD_MESSAGES              = "У вас нет непрочитанных сообщений \nили нестабильное интернет соединение";
-    private final String INFORMATION_NO_STUDENTS               = "В базе данных нет студентов.";
-    private final String INFORMATION_NO_USER                   = "Вы не вошли в почтовый аккаунт";
-    private final String CONFIRMATION_SURE_TO_QUIT_ACCOUNT     = "Вы уверены, что хотите выйти из почтового аккаунта?";
-    private final String CONFIRMATION_SURE_TO_QUIT             = "Вы уверены, что хотите завершить работу программы?";
-    private final String CONFIRMATION_SURE_TO_CHANGE_DIRECTORY = "Вы уверены, что хотите изменить директорию для загрузки файлов? \nДанная директория изменится для всех существующих студентов";
+
+    private StudentModel studentModel = StudentModel.getInstance();
+    private UserModel userModel = UserModel.getInstance();
+    private YandexMailModel yandexMailModel = YandexMailModel.getInstance();
+
+    public MainController() throws MessagingException {
+        if (!userModel.isLogged()) {
+            changeUser();
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -58,19 +57,14 @@ public class MainController extends BaseController implements Initializable {
             try {
                 StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
                 toEmail.setText(student.getEmailAddress());
-                themeStage.setText(String.valueOf(student.getStage()));
+                themeStage.setText(String.valueOf(student.getStageId()));
             } catch (NullPointerException ignore) {
             }
         });
 
         textArea.setEditable(false);
-        dataBaseModel = DataBaseModel.getInstance();
 
-        if (!UserModel.getInstance().isLogged()) {
-            changeUser();
-        }
-
-        students = dataBaseModel.getStudents();
+        students = studentModel.getStudents();
         ID.setCellValueFactory(new PropertyValueFactory<>("id"));
         PERSONAL.setCellValueFactory(new PropertyValueFactory<>("personal"));
         EMAIL.setCellValueFactory(new PropertyValueFactory<>("emailAddress"));
@@ -165,7 +159,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void inboxCount() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             try {
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, YandexMailModel.getInstance().inboxMessagesCount() + " входящих сообщений. \n(" + YandexMailModel.getInstance().notSeenMessagesCount() + " непрочитанных)");
             } catch (MessagingException e) {
@@ -177,7 +171,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void inboxNotSeenCount() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             try {
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, YandexMailModel.getInstance().notSeenMessagesCount() + " непрочитанных сообщений");
             } catch (MessagingException e) {
@@ -189,7 +183,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void showNotSeenMessages() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             try {
                 if (YandexMailModel.getInstance().notSeenMessagesCount() > 0) {
                     ArrayList<Message> messages = YandexMailModel.getInstance().getNotSeenInboxMessages();
@@ -209,10 +203,10 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void loadNotSeenMessages() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             try {
                 if (YandexMailModel.getInstance().notSeenMessagesCount() > 0) {
-                    YandexMailModel.getInstance().loadNotSeenInboxMessage(dataBaseModel, rootFolder);
+                    YandexMailModel.getInstance().loadNotSeenInboxMessage(rootFolder);
                 } else
                     newAlert(Alert.AlertType.ERROR, ERROR, ERROR_NO_UNREAD_MESSAGES);
             } catch (MessagingException e) {
@@ -225,7 +219,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void showAllStudents() {
-        students = dataBaseModel.getStudents();
+        students = studentModel.getStudents();
         if (students == null)
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_STUDENTS);
         else
@@ -233,7 +227,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void yandexQuit() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_SURE_TO_QUIT_ACCOUNT);
             if (option.isPresent())
                 if (option.get() == ButtonType.OK) {
@@ -245,7 +239,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void sendEmail() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             newAlert(Alert.AlertType.ERROR, ERROR, "Вы не вошли в почтовый аккаунт (Яндекс почта -> Войти в почту)");
         } else if (message.getText().isEmpty()) {
             newAlert(Alert.AlertType.ERROR, ERROR, "Вы не ввели сообщение");
@@ -278,7 +272,7 @@ public class MainController extends BaseController implements Initializable {
                         YandexMailModel.getInstance().deleteInboxDialogMessages(student.getEmailAddress());
                     }
                 if (new File(student.getFolderPath()).exists() && YandexMailModel.getInstance().getInboxDialogMessages(student.getEmailAddress()).isEmpty()) {
-                    dataBaseModel.deleteStudent(student.getId());
+                    studentModel.deleteStudent(student.getId());
                     showAllStudents();
                 }
             } else {
@@ -302,7 +296,7 @@ public class MainController extends BaseController implements Initializable {
                 if (fileChooser.showOpenDialog(new JButton()) == JFileChooser.APPROVE_OPTION) {
                     rootFolder = fileChooser.getSelectedFile();
                     if (rootFolder != null) {
-                        dataBaseModel.changeDir(rootFolder);
+                        studentModel.changeDir(rootFolder);
                         showAllStudents();
                     }
                 }
@@ -325,7 +319,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void changeStatus() {
-        /*if (UserModel.getInstance().isLogged()) {
+        /*if (userModel.isLogged()) {
             Student student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
                 Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Вы действительно хотите изменить статус выбранного студента на " + student.getNextStatus() + "?");
@@ -393,7 +387,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void getDialogWithStudent() {
-        if (UserModel.getInstance().isLogged()) {
+        if (userModel.isLogged()) {
             StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
                 chooseStageForDialog(student);

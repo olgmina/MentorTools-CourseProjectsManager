@@ -1,5 +1,6 @@
 package models;
 
+import entities.StageEntity;
 import entities.StatusEntity;
 import javafx.collections.ObservableList;
 
@@ -7,7 +8,7 @@ public class StatusModel extends BaseModel {
 
     private static StatusModel instance = null;
 
-    private static synchronized StatusModel getInstance() {
+    public static synchronized StatusModel getInstance() {
         if (instance == null)
             instance = new StatusModel();
         return instance;
@@ -16,8 +17,16 @@ public class StatusModel extends BaseModel {
     private StatusModel() {
     }
 
-    public StatusEntity getStatus(String id) {
+    public StatusEntity getStatus(int id) {
         return dataBaseModel.getStatus(id);
+    }
+
+    public StatusEntity getFirstStatus() {
+        return dataBaseModel.getFirstStatus();
+    }
+
+    public StatusEntity getLastStatus() {
+        return dataBaseModel.getLastStatus();
     }
 
     public ObservableList<StatusEntity> getStatuses() {

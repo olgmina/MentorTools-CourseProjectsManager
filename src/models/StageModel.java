@@ -7,7 +7,7 @@ public class StageModel extends BaseModel {
 
     private static StageModel instance = null;
 
-    private static synchronized StageModel getInstance() {
+    public static synchronized StageModel getInstance() {
         if (instance == null)
             instance = new StageModel();
         return instance;
@@ -16,8 +16,20 @@ public class StageModel extends BaseModel {
     private StageModel() {
     }
 
-    public StageEntity getStage(String id) {
+    public StageEntity getStage(int id) {
         return dataBaseModel.getStage(id);
+    }
+
+    public StageEntity getNextStage(StageEntity currentStage) {
+        return dataBaseModel.getNextStage(currentStage);
+    }
+
+    public StageEntity getFirstStage() {
+        return dataBaseModel.getFirstStage();
+    }
+
+    public StageEntity getLastStage() {
+        return dataBaseModel.getLastStage();
     }
 
     public ObservableList<StageEntity> getStages() {
@@ -34,5 +46,9 @@ public class StageModel extends BaseModel {
 
     public void updateStage(StageEntity stage) {
         dataBaseModel.updateStage(stage);
+    }
+
+    public boolean isStageCorrect(String name) {
+        return dataBaseModel.isStageCorrect(name);
     }
 }

@@ -1,21 +1,22 @@
 package entities;
 
 public class StudentEntity {
+
     private final int id;
     private String personal;
     private final String emailAddress;
     private String folderPath;
-    private int stage;
-    private int status;
+    private int stageId;
+    private int statusId;
     private int fileCount;
 
-    public StudentEntity(int id, String personal, String emailAddress, String folderPath, int stage, int status, int fileCount) {
+    public StudentEntity(int id, String personal, String emailAddress, String folderPath, int stageId, int statusId, int fileCount) {
         this.id = id;
         this.personal = personal;
         this.emailAddress = emailAddress;
         this.folderPath = folderPath;
-        this.stage = stage;
-        this.status = status;
+        this.stageId = stageId;
+        this.statusId = statusId;
         this.fileCount = fileCount;
     }
 
@@ -43,20 +44,20 @@ public class StudentEntity {
         this.folderPath = folderPath;
     }
 
-    public int getStage() {
-        return stage;
+    public int getStageId() {
+        return stageId;
     }
 
-    public void setStage(int stage) {
-        this.stage = stage;
+    public void setStageId(int stage) {
+        this.stageId = stage;
     }
 
-    public int getStatus() {
-        return status;
+    public int getStatusId() {
+        return statusId;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setStatusId(int status) {
+        this.statusId = status;
     }
 
     public int getFileCount() {

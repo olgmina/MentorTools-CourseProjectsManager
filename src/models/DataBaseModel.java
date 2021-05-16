@@ -52,8 +52,8 @@ public class DataBaseModel {
         return getStudentFromResultSet(
                 executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
-                            "FROM Student " +
-                            "WHERE emailAddress = '" + emailAddress + "'"
+                                "FROM Student " +
+                                "WHERE emailAddress = '" + emailAddress + "'"
                 )
         );
     }
@@ -62,7 +62,7 @@ public class DataBaseModel {
         return getStudentsFromResultSet(
                 executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
-                            "FROM Student"
+                                "FROM Student"
                 )
         );
     }
@@ -76,12 +76,12 @@ public class DataBaseModel {
                         "id_stage, " +
                         "id_status" +
                         ") " +
-                    "VALUES(" +
+                        "VALUES(" +
                         "'" + student.getPersonal() + "'," +
                         "'" + student.getEmailAddress() + "'," +
                         "'" + student.getFolderPath() + "'," +
-                        student.getStage() + "," +
-                        student.getStatus() +
+                        student.getStageId() + "," +
+                        student.getStatusId() +
                         ")"
         );
     }
@@ -89,20 +89,20 @@ public class DataBaseModel {
     public void deleteStudent(int id) {
         executeUpdate(
                 "DELETE FROM Student " +
-                    "WHERE id = " + id
+                        "WHERE id = " + id
         );
     }
 
     public void updateStudent(StudentEntity student) {
         executeUpdate(
                 "UPDATE Student " +
-                    "SET " +
+                        "SET " +
                         "personal = '" + student.getPersonal() + "', " +
                         "folderPath = '" + student.getFolderPath() + "', " +
-                        "id_stage = " + student.getStage() + ", " +
-                        "id_status = " + student.getStatus() + ", " +
+                        "id_stage = " + student.getStageId() + ", " +
+                        "id_status = " + student.getStatusId() + ", " +
                         "fileCount = " + student.getFileCount() + " " +
-                    "WHERE id = " + student.getId()
+                        "WHERE id = " + student.getId()
         );
     }
 
@@ -149,12 +149,53 @@ public class DataBaseModel {
     --------------Stage----------------------------------------
     ---------------------------------------------------------*/
 
-    public StageEntity getStage(String id) {
+    public StageEntity getStage(int id) {
         return getStageFromResultSet(
                 executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage " +
                                 "WHERE id = " + id + ""
+                )
+        );
+    }
+
+    public StageEntity getStage(String name) {
+        return getStageFromResultSet(
+                executeQuery(
+                        "SELECT id, name " +
+                                "FROM Stage " +
+                                "WHERE name = '" + name + "'"
+                )
+        );
+    }
+
+    public StageEntity getNextStage(StageEntity currentStage) {
+        return getStageFromResultSet(
+                executeQuery(
+                        "SELECT TOP(1) id, name " +
+                                "FROM Stage " +
+                                "WHERE id > " + currentStage.getId() + "" +
+                                "ORDER BY id ASC"
+                )
+        );
+    }
+
+    public StageEntity getFirstStage() {
+        return getStageFromResultSet(
+                executeQuery(
+                        "SELECT TOP(1) id, name " +
+                                "FROM Stage " +
+                                "ORDER BY id ASC"
+                )
+        );
+    }
+
+    public StageEntity getLastStage() {
+        return getStageFromResultSet(
+                executeQuery(
+                        "SELECT TOP(1) id, name " +
+                                "FROM Stage " +
+                                "ORDER BY id DESC"
                 )
         );
     }
@@ -191,6 +232,12 @@ public class DataBaseModel {
         );
     }
 
+    public boolean isStageCorrect(String name) {
+        if (getStage(name) != null)
+            return true;
+        return false;
+    }
+
     private StageEntity getStageFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
@@ -219,12 +266,32 @@ public class DataBaseModel {
     --------------Status---------------------------------------
     ---------------------------------------------------------*/
 
-    public StatusEntity getStatus(String id) {
+    public StatusEntity getStatus(int id) {
         return getStatusFromResultSet(
                 executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "WHERE id = " + id + ""
+                )
+        );
+    }
+
+    public StatusEntity getFirstStatus() {
+        return getStatusFromResultSet(
+                executeQuery(
+                        "SELECT TOP(1) id, name " +
+                                "FROM Status " +
+                                "ORDER BY id ASC"
+                )
+        );
+    }
+
+    public StatusEntity getLastStatus() {
+        return getStatusFromResultSet(
+                executeQuery(
+                        "SELECT TOP(1) id, name " +
+                                "FROM Status " +
+                                "ORDER BY id DESC"
                 )
         );
     }
@@ -302,7 +369,7 @@ public class DataBaseModel {
         clearUser();
         executeUpdate(
                 "INSERT INTO User(username, password, personal) " +
-                    "VALUES('" + user.getUsername() + "','" + user.getPassword() + "','" + user.getPersonal() + "')"
+                        "VALUES('" + user.getUsername() + "','" + user.getPassword() + "','" + user.getPersonal() + "')"
         );
     }
 
@@ -318,7 +385,7 @@ public class DataBaseModel {
     public void clearUser() {
         executeUpdate(
                 "DELETE " +
-                    "FROM User"
+                        "FROM User"
         );
     }
 
@@ -349,8 +416,8 @@ public class DataBaseModel {
         return getAutoMessageFromResultSet(
                 executeQuery(
                         "SELECT id, message_name, message_text " +
-                            "FROM Auto_message " +
-                            "WHERE message_name = '" + name + "'"
+                                "FROM Auto_message " +
+                                "WHERE message_name = '" + name + "'"
                 )
         );
     }
@@ -358,9 +425,9 @@ public class DataBaseModel {
     public void updateAutoMessage(AutoMessageEntity autoMessage) {
         executeUpdate(
                 "UPDATE Auto_message " +
-                    "SET " +
-                    "message_text = '" + autoMessage.getText() + "' " +
-                    "WHERE id = " + autoMessage.getId() + ""
+                        "SET " +
+                        "message_text = '" + autoMessage.getText() + "' " +
+                        "WHERE id = " + autoMessage.getId() + ""
         );
     }
 

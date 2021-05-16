@@ -13,7 +13,6 @@ public interface MailModel {
     ArrayList<Message> getInboxMessages();
     ArrayList<Message> getInboxDialogMessages(String emailTo, String... themes);
     void deleteInboxDialogMessages(String emailTo);
-    void loadNotSeenInboxMessage(DataBaseModel dataBaseModel, File rootFolder);
+    void loadNotSeenInboxMessage(File rootFolder);
     void messagesSetSeen();
-    String getFromEmail();
 }

@@ -9,7 +9,7 @@ public class StudentModel extends BaseModel{
 
     private static StudentModel instance = null;
 
-    private static synchronized StudentModel getInstance() {
+    public static synchronized StudentModel getInstance() {
         if (instance == null)
             instance = new StudentModel();
         return instance;

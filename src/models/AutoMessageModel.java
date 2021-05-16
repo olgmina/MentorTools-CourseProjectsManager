@@ -9,6 +9,8 @@ public class AutoMessageModel extends BaseModel{
     public static final String TEXT_STAGE_IS_ALREADY_COMPLETED = "TEXT_STAGE_IS_ALREADY_COMPLETED";
     public static final String TEXT_YOU_HAVE_NOT_DONE_STAGE    = "TEXT_YOU_HAVE_NOT_DONE_STAGE";
     public static final String TEXT_WRONG_FORMAT               = "TEXT_WRONG_FORMAT";
+    public static final String TEXT_NOT_NEXT_STAGE             = "TEXT_NOT_NEXT_STAGE";
+    public static final String TEXT_COURSE_PROJECT_COMPLETED   = "TEXT_COURSE_PROJECT_COMPLETED";
     public static final String TEXT_ANSWERED_ON_DATE           = "TEXT_ANSWERED_ON_DATE";
     private static AutoMessageModel instance = null;
 

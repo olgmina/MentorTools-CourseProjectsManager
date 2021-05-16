@@ -1,5 +1,7 @@
 package models;
 
+import entities.StageEntity;
+import entities.StatusEntity;
 import entities.StudentEntity;
 import entities.UserEntity;
 
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
 
 public class YandexMailModel extends BaseModel implements MailModel {
@@ -23,6 +26,10 @@ public class YandexMailModel extends BaseModel implements MailModel {
     private String personal;
     private final String IMAP_host = "imap.yandex.ru";
     private static YandexMailModel instance = null;
+    private StageModel stageModel = StageModel.getInstance();
+    private StatusModel statusModel = StatusModel.getInstance();
+    private StudentModel studentModel = StudentModel.getInstance();
+    private AutoMessageModel autoMessageModel = AutoMessageModel.getInstance();
 
     public static synchronized YandexMailModel getInstance() throws MessagingException {
         if (instance == null) {
@@ -32,14 +39,16 @@ public class YandexMailModel extends BaseModel implements MailModel {
     }
 
     private YandexMailModel() throws MessagingException {
-        UserEntity user = DataBaseModel.getInstance().getUser();
+        UserEntity user = dataBaseModel.getUser();
+        this.fromEmail  = "example@yandex.ru";
+        this.password   = "password";
+        this.personal   = "personal";
         if (user != null) {
             this.fromEmail = user.getUsername();
-            this.password = user.getPassword();
-            this.personal = user.getPersonal();
-            getInbox();
+            this.password  = user.getPassword();
+            this.personal  = user.getPersonal();
         }
-
+        getInbox();
     }
 
     private Folder getInbox() throws MessagingException {
@@ -96,8 +105,8 @@ public class YandexMailModel extends BaseModel implements MailModel {
         };
     }
 
-    private void saveFile(StudentEntity student, Message message, DataBaseModel dataBaseModel) throws Exception {
-        File folder = new File(student.getFolderPath() + "\\" + student.getStage() + "\\" + student.getStatus());
+    private void saveFile(StudentEntity student, Message message) throws Exception {
+        File folder = new File(student.getFolderPath() + "\\" + student.getStageId() + "\\" + student.getStatusId());
         System.out.println(folder.mkdir());
         System.out.println(folder.mkdirs());
         MimeMultipart mp;
@@ -258,67 +267,140 @@ public class YandexMailModel extends BaseModel implements MailModel {
     }
 
     @Override
-    public void loadNotSeenInboxMessage(DataBaseModel dataBaseModel, File rootFolder) {
-        /*try {
+    public void loadNotSeenInboxMessage(File rootFolder) {
+        try {
             Folder inbox = getInbox();
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) {
-                if (EmailMessageReader.getSubject(message).toLowerCase().trim().equals("задание") || EmailMessageReader.getSubject(message).toLowerCase().trim().equals("разработка программы") || EmailMessageReader.getSubject(message).toLowerCase().trim().equals("оформление пояснительной записки")) {
-                    Student student = dataBase.getStudent(EmailMessageReader.getFromEmailAddress(message));
+                String messageStage = EmailMessageReader.getSubject(message).toLowerCase().trim();
+                String messageFrom  = EmailMessageReader.getFromEmailAddress(message);
+                String messagePersonal  = EmailMessageReader.getFromPersonal(message);
+                Date messageDate    = EmailMessageReader.getDate(message);
+                String PostScriptum = "\n\n" + autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_ANSWERED_ON_DATE).getText().replaceAll("#ДАТА_СООБЩЕНИЯ#", messageDate.toString());
+                StageEntity firstStage = stageModel.getFirstStage();
+                StageEntity lastStage = stageModel.getLastStage();
+                StatusEntity firstStatus = statusModel.getFirstStatus();
+                StatusEntity lastStatus = statusModel.getLastStatus();
+                // Если корректный этап в письме
+                if (stageModel.isStageCorrect(messageStage)) {
+                    StudentEntity student = studentModel.getStudent(messageFrom);
+                    // Если написал существующий студент
                     if (student != null) {
-                        String messageStage = EmailMessageReader.getSubject(message);
-                        String studentStage = student.getStage();
-                        boolean stageEquals = messageStage.toLowerCase().trim().equals(studentStage);
-                        if (stageEquals) {
-                            if (!student.getStatus().equals("завершено")) {
-                                //скачать в существующую папку
+                        StageEntity currentStage = stageModel.getStage(student.getStageId());
+                        // Если студент верно указал этап
+                        if (messageStage.equals(currentStage.getName())) {
+                            //Если этап не завершен
+                            if (student.getStatusId() != lastStatus.getId()) {
                                 try {
-                                    saveFile(student, message, dataBase);
+                                    //Сохранить файлы
+                                    saveFile(student, message);
                                 } catch (Exception e) {
-                                    sendMessage(student.getEmailAddress(), THEME_WRONG_FORMAT, TEXT_WRONG_FORMAT + "\n\n" + TEXT_ANSWERED_ON_DATE + EmailMessageReader.getDate(message));
+                                    //Ошибка, формат файла
+                                    sendMessage(
+                                            student.getEmailAddress(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_FORMAT).getText(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_WRONG_FORMAT).getText() + PostScriptum
+                                    );
                                 }
-                            } else if (student.getStatus().equals("завершено")) {
-                                //отправить сообщение о том, что данный этап завершен
-                                sendMessage(student.getEmailAddress(), THEME_WRONG_STAGE, TEXT_STAGE_IS_ALREADY_COMPLETED + "\n\n" + TEXT_ANSWERED_ON_DATE + EmailMessageReader.getDate(message));
                             }
-                        } else {
-                            if (!student.getStatus().equals("завершено") || !messageStage.toLowerCase().trim().equals(student.getNextStage())) {
-                                //отправить сообщение о том, что данный студент не завершил один из предыдущих этапов (student.getStage())
-                                sendMessage(student.getEmailAddress(), THEME_WRONG_STAGE, TEXT_YOU_HAVE_NOT_DONE_STAGE + "\n\n" + TEXT_ANSWERED_ON_DATE + EmailMessageReader.getDate(message));
-                            } else if (student.getStatus().equals("завершено") && messageStage.toLowerCase().trim().equals(student.getNextStage())) {
-                                //изменить этап на новый и скачать файлы в новую папку, изменить в бд
-                                student.setStageString(student.getNextStage());
-                                student.setStatus(1);
-                                dataBase.updateStudent(student);
-                                try {
-                                    saveFile(student, message, dataBase);
-                                } catch (Exception e) {
-                                    sendMessage(student.getEmailAddress(), THEME_WRONG_FORMAT, TEXT_WRONG_FORMAT + "\n\n" + TEXT_ANSWERED_ON_DATE + EmailMessageReader.getDate(message));
+                            //Если этап завершен
+                            else {
+                                //Ошибка, этап уже завершен
+                                sendMessage(
+                                        student.getEmailAddress(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_STAGE_IS_ALREADY_COMPLETED).getText().replaceAll("#УКАЗАННЫЙ_ЭТАП#", messageStage) + PostScriptum
+                                );
+                            }
+                        }
+                        // Если студент неверно указал этап
+                        else {
+                            // Если текущий этап не завершен
+                            if (student.getStatusId() != lastStatus.getId()) {
+                                //Ошибка, не завершен текущий этап
+                                sendMessage(
+                                        student.getEmailAddress(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()) + PostScriptum
+                                );
+                            }
+                            // Если текущий этап завершен
+                            else {
+                                StageEntity nextStage = stageModel.getNextStage(currentStage);
+                                //Если существует следующий этап
+                                if (nextStage != null) {
+                                    // Если указан следующий этап
+                                    if (messageStage.equals(nextStage.getName())) {
+                                        //Изменить этап на новый и скачать файлы в новую папку, изменить в бд
+                                        student.setStageId(nextStage.getId());
+                                        student.setStatusId(firstStatus.getId());
+                                        studentModel.updateStudent(student);
+                                        try {
+                                            saveFile(student, message);
+                                        } catch (Exception e) {
+                                            //Ошибка, формат файла
+                                            sendMessage(
+                                                    student.getEmailAddress(),
+                                                    autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_FORMAT).getText(),
+                                                    autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_WRONG_FORMAT).getText() + PostScriptum
+                                            );
+                                        }
+                                    }
+                                    // Если указан не следующий этап
+                                    else {
+                                        //Ошибка, пропуск этапа
+                                        sendMessage(
+                                                student.getEmailAddress(),
+                                                autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                                autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_NOT_NEXT_STAGE).getText().replaceAll("#СЛЕДУЮЩИЙ_ЭТАП#", nextStage.getName()) + PostScriptum
+                                        );
+                                    }
+                                }
+                                //Если следующего этапа не существует
+                                else {
+                                    //Ошибка, курсовой проект завершен
+                                    sendMessage(
+                                            student.getEmailAddress(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_COURSE_PROJECT_COMPLETED).getText() + PostScriptum
+                                    );
                                 }
                             }
                         }
-                    } else {
-                        if (!EmailMessageReader.getFromEmailAddress(message).equals(fromEmail)) {
-                            String stage = EmailMessageReader.getSubject(message);
-                            if (stage.toLowerCase().trim().equals("задание")) {
-                                //создать папку, скачать, добавить в бд.
-                                String personal = EmailMessageReader.getFromPersonal(message);
-                                String emailAddress = EmailMessageReader.getFromEmailAddress(message);
+                    }
+                    // Если студент не добавлен
+                    else {
+                        //Если явтор не преподаватель
+                        if (!messageFrom.equals(fromEmail)) {
+                            //Если тема сообщения - первый этап
+                            if (messageStage.equals(firstStage.getName())) {
+                                //Создать папку, скачать, добавить в бд.
                                 File folder = new File(rootFolder.getPath() + "\\" + EmailMessageReader.getFromEmailAddress(message) + "\\");
                                 String folderPath = folder.getPath();
-                                int studentStage = 1;
-                                int studentStatus = 1;
+                                int stageId = stageModel.getFirstStage().getId();
+                                int statusId = statusModel.getFirstStatus().getId();
                                 int fileCount = 0;
-                                dataBase.addStudent(new Student(personal, emailAddress, folderPath, studentStage, studentStatus, fileCount));
-                                student = dataBase.getStudent(emailAddress);
+                                studentModel.addStudent(new StudentEntity(0, messagePersonal, messageFrom, folderPath, stageId, statusId, fileCount));
+                                student = studentModel.getStudent(messageFrom);
                                 try {
-                                    saveFile(student, message, dataBase);
+                                    saveFile(student, message);
                                 } catch (Exception e) {
-                                    sendMessage(student.getEmailAddress(), THEME_WRONG_FORMAT, TEXT_WRONG_FORMAT + "\n\n" + TEXT_ANSWERED_ON_DATE + EmailMessageReader.getDate(message));
+                                    //Ошибка, формат файла
+                                    sendMessage(
+                                            student.getEmailAddress(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_FORMAT).getText(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_WRONG_FORMAT).getText() + PostScriptum
+                                    );
                                 }
-                            } else if (stage.toLowerCase().trim().equals("разработка программы") || stage.toLowerCase().trim().equals("оформление пояснительной записки")) {
-                                //отправить сообщение, что студент не сдал первый этап (задание)
-                                sendMessage(EmailMessageReader.getFromEmailAddress(message), THEME_WRONG_STAGE, TEXT_YOU_HAVE_NOT_DONE_STAGE + "\n\n" + TEXT_ANSWERED_ON_DATE + EmailMessageReader.getDate(message));
+                            }
+                            //Если тема сообщения - не первый этап
+                            else {
+                                //Ошибка, не завершен первый этап
+                                sendMessage(
+                                        student.getEmailAddress(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", firstStage.getName()) + PostScriptum
+                                );
                             }
                         }
                     }
@@ -326,26 +408,18 @@ public class YandexMailModel extends BaseModel implements MailModel {
             }
             messagesSetSeen();
         } catch (MessagingException ignored) {
-        }*/
+        }
     }
 
     @Override
     public void messagesSetSeen() {
-        Session session = createSession();
         try {
-            Store store = session.getStore();
-            store.connect(IMAP_host, fromEmail, password); // Подключение к почтовому серверу
-            Folder inbox = store.getFolder("INBOX"); // Папка входящих сообщений
-
-            inbox.open(Folder.READ_WRITE); // Открываем папку в режиме для чтения и записи
+            Folder inbox = getInbox();
+            inbox.open(Folder.READ_ONLY);
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) message.setFlag(Flags.Flag.SEEN, true);
+            inbox.close();
         } catch (MessagingException ignored) { }
-    }
-
-    @Override
-    public String getFromEmail() {
-        return fromEmail;
     }
 }
 

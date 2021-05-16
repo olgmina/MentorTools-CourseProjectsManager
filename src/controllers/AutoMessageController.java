@@ -1,6 +1,7 @@
 package controllers;
 
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import entities.AutoMessageEntity;
@@ -18,8 +19,10 @@ public class AutoMessageController extends BaseController implements Initializab
     public TextArea TEXT_WRONG_FORMAT;
     public TextArea TEXT_STAGE_IS_ALREADY_COMPLETED;
     public TextArea TEXT_ANSWERED_ON_DATE;
-    public Map<String, TextArea> textAreaStringMap = new HashMap<>();
+    public TextArea TEXT_NOT_NEXT_STAGE;
+    public TextArea TEXT_COURSE_PROJECT_COMPLETED;
     public Label message;
+    public Map<String, TextArea> textAreaStringMap = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -28,6 +31,8 @@ public class AutoMessageController extends BaseController implements Initializab
         textAreaStringMap.put(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE, TEXT_YOU_HAVE_NOT_DONE_STAGE);
         textAreaStringMap.put(AutoMessageModel.TEXT_WRONG_FORMAT, TEXT_WRONG_FORMAT);
         textAreaStringMap.put(AutoMessageModel.TEXT_STAGE_IS_ALREADY_COMPLETED, TEXT_STAGE_IS_ALREADY_COMPLETED);
+        textAreaStringMap.put(AutoMessageModel.TEXT_NOT_NEXT_STAGE, TEXT_NOT_NEXT_STAGE);
+        textAreaStringMap.put(AutoMessageModel.TEXT_COURSE_PROJECT_COMPLETED, TEXT_COURSE_PROJECT_COMPLETED);
         textAreaStringMap.put(AutoMessageModel.TEXT_ANSWERED_ON_DATE, TEXT_ANSWERED_ON_DATE);
         textAreaStringMap.forEach(
                 (name, textArea) -> textArea.setText(AutoMessageModel.getInstance().getAutoMessage(name).getText())
@@ -42,7 +47,6 @@ public class AutoMessageController extends BaseController implements Initializab
                     AutoMessageModel.getInstance().saveAutoMessage(autoMessage);
                 }
         );
-        message.setText("Данные успешно сохранены");
-        message.setStyle("-fx-text-fill: green;");
+        newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_SAVE);
     }
 }
