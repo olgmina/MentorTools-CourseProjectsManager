@@ -11,7 +11,7 @@ public interface MailModel {
     void sendMessage(String toEmail, String subject, String body) throws MessagingException;
     ArrayList<Message> getNotSeenInboxMessages();
     ArrayList<Message> getInboxMessages();
-    ArrayList<Message> getInboxDialogMessages(String emailTo, String... themes);
+    ArrayList<Message> getInboxDialogMessages(String emailTo, String theme);
     void deleteInboxDialogMessages(String emailTo);
     void loadNotSeenInboxMessage(File rootFolder);
     void messagesSetSeen();
