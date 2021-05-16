@@ -17,22 +17,22 @@ public class StageModel extends BaseModel {
     }
 
     public StageEntity getStage(String id) {
-        return dbHandler.getStage(id);
+        return dataBaseModel.getStage(id);
     }
 
     public ObservableList<StageEntity> getStages() {
-        return dbHandler.getStages();
+        return dataBaseModel.getStages();
     }
 
     public void addStage(StageEntity stage) {
-        dbHandler.addStage(stage);
+        dataBaseModel.addStage(stage);
     }
 
     public void deleteStage(int id) {
-        dbHandler.deleteStage(id);
+        dataBaseModel.deleteStage(id);
     }
 
     public void updateStage(StageEntity stage) {
-        dbHandler.updateStage(stage);
+        dataBaseModel.updateStage(stage);
     }
 }

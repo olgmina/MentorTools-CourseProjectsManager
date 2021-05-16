@@ -17,22 +17,22 @@ public class StatusModel extends BaseModel {
     }
 
     public StatusEntity getStatus(String id) {
-        return dbHandler.getStatus(id);
+        return dataBaseModel.getStatus(id);
     }
 
     public ObservableList<StatusEntity> getStatuses() {
-        return dbHandler.getStatuses();
+        return dataBaseModel.getStatuses();
     }
 
     public void addStatus(StatusEntity status) {
-        dbHandler.addStatus(status);
+        dataBaseModel.addStatus(status);
     }
 
     public void deleteStatus(int id) {
-        dbHandler.deleteStatus(id);
+        dataBaseModel.deleteStatus(id);
     }
 
     public void updateStatus(StatusEntity status) {
-        dbHandler.updateStatus(status);
+        dataBaseModel.updateStatus(status);
     }
 }

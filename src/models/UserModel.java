@@ -13,23 +13,23 @@ public class UserModel extends BaseModel {
     }
 
     public UserEntity getUser() {
-        return dbHandler.getUser();
+        return dataBaseModel.getUser();
     }
 
     public void insertUser(UserEntity user) {
-        dbHandler.insertUser(user);
+        dataBaseModel.insertUser(user);
     }
 
     public void updateUser(UserEntity user) {
-        dbHandler.updateUser(user);
+        dataBaseModel.updateUser(user);
     }
 
     public void clearUser() {
-        dbHandler.clearUser();
+        dataBaseModel.clearUser();
     }
 
     public boolean isLogged() {
-        return dbHandler.isLogged();
+        return dataBaseModel.isLogged();
     }
 
 }

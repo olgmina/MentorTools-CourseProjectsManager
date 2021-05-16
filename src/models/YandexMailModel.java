@@ -32,7 +32,7 @@ public class YandexMailModel extends BaseModel implements Mail {
     }
 
     private YandexMailModel() throws MessagingException {
-        UserEntity user = DbHandler.getInstance().getUser();
+        UserEntity user = DataBaseModel.getInstance().getUser();
         if (user != null) {
             this.fromEmail = user.getUsername();
             this.password = user.getPassword();
@@ -96,7 +96,7 @@ public class YandexMailModel extends BaseModel implements Mail {
         };
     }
 
-    private void saveFile(StudentEntity student, Message message, DbHandler dataBase) throws Exception {
+    private void saveFile(StudentEntity student, Message message, DataBaseModel dataBaseModel) throws Exception {
         File folder = new File(student.getFolderPath() + "\\" + student.getStage() + "\\" + student.getStatus());
         System.out.println(folder.mkdir());
         System.out.println(folder.mkdirs());
@@ -113,7 +113,7 @@ public class YandexMailModel extends BaseModel implements Mail {
                             || file.getFileName().contains(".c")) {
                         file.saveFile(folder.getPath());
                         student.setFileCount(student.getFileCount() + 1);
-                        dataBase.updateStudent(student);
+                        dataBaseModel.updateStudent(student);
                         File thisFile = new File(folder + "\\" + file.getFileName());
                         System.out.println(thisFile.renameTo(new File(folder.getPath() + "\\" + student.getFileCount() + file.getFileName())));
                     }
@@ -258,7 +258,7 @@ public class YandexMailModel extends BaseModel implements Mail {
     }
 
     @Override
-    public void loadNotSeenInboxMessage(DbHandler dataBase, File rootFolder) {
+    public void loadNotSeenInboxMessage(DataBaseModel dataBaseModel, File rootFolder) {
         /*try {
             Folder inbox = getInbox();
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));

@@ -12,7 +12,6 @@ import models.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -37,7 +36,7 @@ public class MainController extends BaseController implements Initializable {
     public TextField themeStage;
     public TextArea message;
 
-    private DbHandler dataBase;
+    private DataBaseModel dataBaseModel;
     private ObservableList<StudentEntity> students = null;
     private File rootFolder;
     private final String ERROR                                 = "Ошибка";
@@ -65,13 +64,13 @@ public class MainController extends BaseController implements Initializable {
         });
 
         textArea.setEditable(false);
-        dataBase = DbHandler.getInstance();
+        dataBaseModel = DataBaseModel.getInstance();
 
         if (!UserModel.getInstance().isLogged()) {
             changeUser();
         }
 
-        students = dataBase.getStudents();
+        students = dataBaseModel.getStudents();
         ID.setCellValueFactory(new PropertyValueFactory<>("id"));
         PERSONAL.setCellValueFactory(new PropertyValueFactory<>("personal"));
         EMAIL.setCellValueFactory(new PropertyValueFactory<>("emailAddress"));
@@ -213,7 +212,7 @@ public class MainController extends BaseController implements Initializable {
         if (UserModel.getInstance().isLogged()) {
             try {
                 if (YandexMailModel.getInstance().notSeenMessagesCount() > 0) {
-                    YandexMailModel.getInstance().loadNotSeenInboxMessage(dataBase, rootFolder);
+                    YandexMailModel.getInstance().loadNotSeenInboxMessage(dataBaseModel, rootFolder);
                 } else
                     newAlert(Alert.AlertType.ERROR, ERROR, ERROR_NO_UNREAD_MESSAGES);
             } catch (MessagingException e) {
@@ -226,7 +225,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void showAllStudents() {
-        students = dataBase.getStudents();
+        students = dataBaseModel.getStudents();
         if (students == null)
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_STUDENTS);
         else
@@ -279,7 +278,7 @@ public class MainController extends BaseController implements Initializable {
                         YandexMailModel.getInstance().deleteInboxDialogMessages(student.getEmailAddress());
                     }
                 if (new File(student.getFolderPath()).exists() && YandexMailModel.getInstance().getInboxDialogMessages(student.getEmailAddress()).isEmpty()) {
-                    dataBase.deleteStudent(student.getId());
+                    dataBaseModel.deleteStudent(student.getId());
                     showAllStudents();
                 }
             } else {
@@ -303,7 +302,7 @@ public class MainController extends BaseController implements Initializable {
                 if (fileChooser.showOpenDialog(new JButton()) == JFileChooser.APPROVE_OPTION) {
                     rootFolder = fileChooser.getSelectedFile();
                     if (rootFolder != null) {
-                        dataBase.changeDir(rootFolder);
+                        dataBaseModel.changeDir(rootFolder);
                         showAllStudents();
                     }
                 }

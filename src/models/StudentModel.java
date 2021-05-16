@@ -18,27 +18,27 @@ public class StudentModel extends BaseModel{
     private StudentModel() { }
 
     public StudentEntity getStudent(String emailAddress) {
-        return dbHandler.getStudent(emailAddress);
+        return dataBaseModel.getStudent(emailAddress);
     }
 
     public ObservableList<StudentEntity> getStudents() {
-        return dbHandler.getStudents();
+        return dataBaseModel.getStudents();
     }
 
     public void addStudent(StudentEntity student) {
-        dbHandler.addStudent(student);
+        dataBaseModel.addStudent(student);
     }
 
     public void deleteStudent(int id) {
-        dbHandler.deleteStudent(id);
+        dataBaseModel.deleteStudent(id);
     }
 
     public void updateStudent(StudentEntity student) {
-        dbHandler.updateStudent(student);
+        dataBaseModel.updateStudent(student);
     }
 
     public void changeDir(File file) {
-        dbHandler.changeDir(file);
+        dataBaseModel.changeDir(file);
     }
 
 }

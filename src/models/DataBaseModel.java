@@ -8,19 +8,19 @@ import org.sqlite.JDBC;
 import java.io.File;
 import java.sql.*;
 
-public class DbHandler {
+public class DataBaseModel {
 
     private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\resources\\DataBase";
-    private static DbHandler instance = null;
+    private static DataBaseModel instance = null;
     private Connection connection;
 
-    public static DbHandler getInstance() {
+    public static DataBaseModel getInstance() {
         if (instance == null)
-            instance = new DbHandler();
+            instance = new DataBaseModel();
         return instance;
     }
 
-    private DbHandler() {
+    private DataBaseModel() {
         try {
             DriverManager.registerDriver(new JDBC());
             this.connection = DriverManager.getConnection(CON_STR);

@@ -21,11 +21,11 @@ public class AutoMessageModel extends BaseModel{
     private AutoMessageModel() { }
 
     public AutoMessageEntity getAutoMessage(String name) {
-        return dbHandler.getAutoMessage(name);
+        return dataBaseModel.getAutoMessage(name);
     }
 
     public void saveAutoMessage(AutoMessageEntity autoMessage) {
-        dbHandler.updateAutoMessage(autoMessage);
+        dataBaseModel.updateAutoMessage(autoMessage);
     }
 
 }
