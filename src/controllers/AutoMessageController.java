@@ -18,7 +18,6 @@ public class AutoMessageController extends BaseController implements Initializab
     public TextArea TEXT_WRONG_FORMAT;
     public TextArea TEXT_STAGE_IS_ALREADY_COMPLETED;
     public TextArea TEXT_ANSWERED_ON_DATE;
-    public AutoMessageModel autoMessageModel = AutoMessageModel.getInstance();
     public Map<String, TextArea> textAreaStringMap = new HashMap<>();
     public Label message;
 
@@ -31,16 +30,16 @@ public class AutoMessageController extends BaseController implements Initializab
         textAreaStringMap.put(AutoMessageModel.TEXT_STAGE_IS_ALREADY_COMPLETED, TEXT_STAGE_IS_ALREADY_COMPLETED);
         textAreaStringMap.put(AutoMessageModel.TEXT_ANSWERED_ON_DATE, TEXT_ANSWERED_ON_DATE);
         textAreaStringMap.forEach(
-                (name, textArea) -> textArea.setText(autoMessageModel.getAutoMessage(name).getText())
+                (name, textArea) -> textArea.setText(AutoMessageModel.getInstance().getAutoMessage(name).getText())
         );
     }
 
     public void saveAction() {
         textAreaStringMap.forEach(
                 (name, textArea) -> {
-                    AutoMessageEntity autoMessage = autoMessageModel.getAutoMessage(name);
+                    AutoMessageEntity autoMessage = AutoMessageModel.getInstance().getAutoMessage(name);
                     autoMessage.setText(textArea.getText());
-                    autoMessageModel.saveAutoMessage(autoMessage);
+                    AutoMessageModel.getInstance().saveAutoMessage(autoMessage);
                 }
         );
         message.setText("Данные успешно сохранены");

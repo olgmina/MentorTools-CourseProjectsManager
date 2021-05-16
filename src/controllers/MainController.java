@@ -1,15 +1,18 @@
 package controllers;
 
+import entities.StudentEntity;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import models.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -20,33 +23,43 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainController extends BaseController implements Initializable {
+
     public TextArea textArea;
-    public TableView<Student> studentsTable;
-    public TableColumn<Student, Integer> ID;
-    public TableColumn<Student, String> PERSONAL;
-    public TableColumn<Student, String> EMAIL;
-    public TableColumn<Student, String> FOLDER;
-    public TableColumn<Student, String> STAGE;
-    public TableColumn<Student, String> STATUS;
-    public TableColumn<Student, String> FILES;
+    public TableView<StudentEntity> studentsTable;
+    public TableColumn<StudentEntity, Integer> ID;
+    public TableColumn<StudentEntity, String> PERSONAL;
+    public TableColumn<StudentEntity, String> EMAIL;
+    public TableColumn<StudentEntity, String> FOLDER;
+    public TableColumn<StudentEntity, String> STAGE;
+    public TableColumn<StudentEntity, String> STATUS;
+    public TableColumn<StudentEntity, String> FILES;
     public TextField toEmail;
     public TextField themeStage;
     public TextArea message;
+
     private DbHandler dataBase;
-    private Mail yandex;
-    private boolean signIn;
-    private ObservableList<Student> students = null;
+    private ObservableList<StudentEntity> students = null;
     private File rootFolder;
+    private final String ERROR                                 = "Ошибка";
+    private final String INFORMATION                           = "Информация";
+    private final String CONFIRMATION                          = "Подтверждение";
+    private final String ERROR_WRONG_LOGIN_OR_PASSWORD         = "Неверный логин / пароль \n или нестабильное интернет соединение";
+    private final String ERROR_NO_UNREAD_MESSAGES              = "У вас нет непрочитанных сообщений \nили нестабильное интернет соединение";
+    private final String INFORMATION_NO_STUDENTS               = "В базе данных нет студентов.";
+    private final String INFORMATION_NO_USER                   = "Вы не вошли в почтовый аккаунт";
+    private final String CONFIRMATION_SURE_TO_QUIT_ACCOUNT     = "Вы уверены, что хотите выйти из почтового аккаунта?";
+    private final String CONFIRMATION_SURE_TO_QUIT             = "Вы уверены, что хотите завершить работу программы?";
+    private final String CONFIRMATION_SURE_TO_CHANGE_DIRECTORY = "Вы уверены, что хотите изменить директорию для загрузки файлов? \nДанная директория изменится для всех существующих студентов";
 
     @Override
-    public void initialize( URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources) {
         rootFolder = new java.io.File("D:\\students\\");
 
         studentsTable.setOnMouseClicked(e -> {
             try {
-                Student student = studentsTable.getSelectionModel().getSelectedItem();
+                StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
                 toEmail.setText(student.getEmailAddress());
-                themeStage.setText(student.getStage());
+                themeStage.setText(String.valueOf(student.getStage()));
             } catch (NullPointerException ignore) {
             }
         });
@@ -54,7 +67,9 @@ public class MainController extends BaseController implements Initializable {
         textArea.setEditable(false);
         dataBase = DbHandler.getInstance();
 
-        changeUser();
+        if (!UserModel.getInstance().isLogged()) {
+            changeUser();
+        }
 
         students = dataBase.getStudents();
         ID.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -67,10 +82,13 @@ public class MainController extends BaseController implements Initializable {
         studentsTable.setItems(students);
     }
 
-    //TODO: изменять пенсональные данные
-    private void newPersonalWindow(Student student) {}
+    //TODO: изменить пенсональные данные
+    private void newPersonalWindow(StudentEntity student) {
 
-    private void chooseStageForDialog(Student student) {
+    }
+
+    //TODO: выбор статуса для диалога
+    private void chooseStageForDialog(StudentEntity student) {
         /*GridPane grid = newGridScene(600, 150,3, 4, 30);
 
         Scene chooseStage = new Scene(grid, grid.getPrefWidth(), grid.getPrefHeight());
@@ -120,7 +138,7 @@ public class MainController extends BaseController implements Initializable {
                     dialog.append(EmailMessageReader.getShortMessage(dialogMessage));
                 textArea.setText(dialog.toString());
             } else
-                newAlert(Alert.AlertType.INFORMATION, "Информация", "Диалог пуст");
+                newAlert(Alert.AlertType.INFORMATION, INFORMATION, "Диалог пуст");
             stageWindow.close();
         });
         stageWindow.showAndWait();*/
@@ -140,56 +158,67 @@ public class MainController extends BaseController implements Initializable {
         return (path.delete());
     }
 
-    public void changeUser() {
-        showScene("../view/UserView.fxml", "Sign in");
-    }
-
     public void close() {
-        Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы уверены, что хотите завершить работу программы?\n");
+        Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_SURE_TO_QUIT);
         if (option.isPresent())
             if (option.get() == ButtonType.OK)
-                System.exit(0);
+                System.exit(200);
     }
 
     public void inboxCount() {
-        if (signIn)
-            newAlert(Alert.AlertType.INFORMATION, "Информация", "У вас " + yandex.inboxMessagesCount() + " входящих сообщений.\n" +
-                    "Из них " + yandex.notSeenMessagesCount() + " непрочитанных.");
+        if (UserModel.getInstance().isLogged()) {
+            try {
+                newAlert(Alert.AlertType.INFORMATION, INFORMATION, YandexMailModel.getInstance().inboxMessagesCount() + " входящих сообщений. \n(" + YandexMailModel.getInstance().notSeenMessagesCount() + " непрочитанных)");
+            } catch (MessagingException e) {
+                newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            }
+        }
         else
             changeUser();
     }
 
     public void inboxNotSeenCount() {
-        if (signIn)
-            newAlert(Alert.AlertType.INFORMATION, "Информация", "У вас " + yandex.notSeenMessagesCount() + " непрочитанных сообщений");
+        if (UserModel.getInstance().isLogged()) {
+            try {
+                newAlert(Alert.AlertType.INFORMATION, INFORMATION, YandexMailModel.getInstance().notSeenMessagesCount() + " непрочитанных сообщений");
+            } catch (MessagingException e) {
+                newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            }
+        }
         else
             changeUser();
     }
 
     public void showNotSeenMessages() {
-        if (signIn) {
-            if (yandex.notSeenMessagesCount() > 0) {
-                ArrayList<Message> messages = yandex.getNotSeenInboxMessages();
-                textArea.setText("");
-                for (Message value : messages) {
-                    textArea.setText(textArea.getText() + EmailMessageReader.getAllMessage(value));
-                    textArea.setText(textArea.getText() + "\n");
-                }
-            } else
-                newAlert(Alert.AlertType.ERROR, "Ошибка", "У вас нет непрочитанных сообщений\n" +
-                        "или нестабильное интернет соединение");
+        if (UserModel.getInstance().isLogged()) {
+            try {
+                if (YandexMailModel.getInstance().notSeenMessagesCount() > 0) {
+                    ArrayList<Message> messages = YandexMailModel.getInstance().getNotSeenInboxMessages();
+                    textArea.setText("");
+                    for (Message value : messages) {
+                        textArea.setText(textArea.getText() + EmailMessageReader.getAllMessage(value));
+                        textArea.setText(textArea.getText() + "\n");
+                    }
+                } else
+                    newAlert(Alert.AlertType.ERROR, ERROR, ERROR_NO_UNREAD_MESSAGES);
+            } catch (MessagingException e) {
+                newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            }
         } else {
             changeUser();
         }
     }
 
     public void loadNotSeenMessages() {
-        if (signIn) {
-            if (yandex.notSeenMessagesCount() > 0) {
-                yandex.loadNotSeenInboxMessage(dataBase, rootFolder);
-            } else
-                newAlert(Alert.AlertType.ERROR, "Ошибка", "У вас нет непрочитанных сообщений\n" +
-                        "или нестабильное интернет соединение");
+        if (UserModel.getInstance().isLogged()) {
+            try {
+                if (YandexMailModel.getInstance().notSeenMessagesCount() > 0) {
+                    YandexMailModel.getInstance().loadNotSeenInboxMessage(dataBase, rootFolder);
+                } else
+                    newAlert(Alert.AlertType.ERROR, ERROR, ERROR_NO_UNREAD_MESSAGES);
+            } catch (MessagingException e) {
+                newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            }
             showAllStudents();
         } else {
             changeUser();
@@ -197,70 +226,72 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void showAllStudents() {
-        //studentsTable.getItems().clear();
         students = dataBase.getStudents();
         if (students == null)
-            newAlert(Alert.AlertType.INFORMATION, "Инфортация", "В базе данных нет студентов.");
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_STUDENTS);
         else
             studentsTable.setItems(students);
     }
 
     public void yandexQuit() {
-        if (signIn) {
-            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы уверены, что хотите выйти из почтового аккаунта?");
+        if (UserModel.getInstance().isLogged()) {
+            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_SURE_TO_QUIT_ACCOUNT);
             if (option.isPresent())
                 if (option.get() == ButtonType.OK) {
-                    signIn = dataBase.isLogged();
                     changeUser();
                 }
         } else {
-            newAlert(Alert.AlertType.INFORMATION, "Инфортация", "Вы не вошли в почтовый аккаунт");
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
         }
     }
 
     public void sendEmail() {
-        if (message.getText().isEmpty()) {
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не ввели сообщение");
+        if (UserModel.getInstance().isLogged()) {
+            newAlert(Alert.AlertType.ERROR, ERROR, "Вы не вошли в почтовый аккаунт (Яндекс почта -> Войти в почту)");
+        } else if (message.getText().isEmpty()) {
+            newAlert(Alert.AlertType.ERROR, ERROR, "Вы не ввели сообщение");
         } else if (toEmail.getText().isEmpty() || themeStage.getText().isEmpty()) {
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента из таблицы");
-        } else if (!signIn) {
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не вошли в почтовый аккаунт (Яндекс почта -> Войти в почту)");
+            newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента из таблицы");
         } else {
             try {
-                yandex.sendMessage(toEmail.getText(), themeStage.getText(), message.getText());
-                newAlert(Alert.AlertType.INFORMATION, "Информация", "Сообщение успешно отправлено");
+                YandexMailModel.getInstance().sendMessage(toEmail.getText(), themeStage.getText(), message.getText());
+                newAlert(Alert.AlertType.INFORMATION, INFORMATION, "Сообщение успешно отправлено");
             } catch (MessagingException e) {
-                newAlert(Alert.AlertType.INFORMATION, "Ошибка", "Сообщение не было отправлено");
+                newAlert(Alert.AlertType.ERROR, ERROR, "Сообщение не было отправлено");
             }
         }
     }
 
     public void deleteStudent() {
-        Student student = studentsTable.getSelectionModel().getSelectedItem();
-        if (student != null) {
-            File file = new File(student.getFolderPath());
-            if (file.exists()) {
-                Optional<ButtonType> option1 = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Удалить папку студента?");
-                if (option1.isPresent())
-                    if (option1.get() == ButtonType.OK)
-                        System.out.println(deleteDirectory(file));
+        try {
+            StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
+            if (student != null) {
+                File file = new File(student.getFolderPath());
+                if (file.exists()) {
+                    Optional<ButtonType> option1 = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Удалить папку студента?");
+                    if (option1.isPresent())
+                        if (option1.get() == ButtonType.OK)
+                            System.out.println(deleteDirectory(file));
+                }
+                Optional<ButtonType> option2 = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Удалить переписку со студентом?");
+                if (option2.isPresent())
+                    if (option2.get() == ButtonType.OK) {
+                        YandexMailModel.getInstance().deleteInboxDialogMessages(student.getEmailAddress());
+                    }
+                if (new File(student.getFolderPath()).exists() && YandexMailModel.getInstance().getInboxDialogMessages(student.getEmailAddress()).isEmpty()) {
+                    dataBase.deleteStudent(student.getId());
+                    showAllStudents();
+                }
+            } else {
+                newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента");
             }
-            Optional<ButtonType> option2 = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Удалить переписку со студентом?");
-            if (option2.isPresent())
-                if (option2.get() == ButtonType.OK)
-                    yandex.deleteInboxDialogMessages(student.getEmailAddress());
-            if (new File(student.getFolderPath()).exists() && yandex.getInboxDialogMessages(student.getEmailAddress()).isEmpty()) {
-                dataBase.deleteStudent(student.getId());
-                showAllStudents();
-            }
-        } else {
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
+        } catch (MessagingException e) {
+            newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
         }
     }
 
     public void changeDir() {
-        Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы уверены, что хотите изменить директорию для загрузки файлов?\n" +
-                "Данная директория изменится для всех существующих студентов");
+        Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_SURE_TO_CHANGE_DIRECTORY);
         if (option.isPresent())
             if (option.get() == ButtonType.OK) {
                 JFileChooser fileChooser = new JFileChooser();
@@ -281,7 +312,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void openDir() {
-        Student student = studentsTable.getSelectionModel().getSelectedItem();
+        StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
         if (student != null) {
             try {
                 Desktop desktop = Desktop.getDesktop();
@@ -290,15 +321,15 @@ public class MainController extends BaseController implements Initializable {
                 ioe.printStackTrace();
             }
         } else {
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
+            newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента");
         }
     }
 
     public void changeStatus() {
-        if (signIn) {
+        /*if (UserModel.getInstance().isLogged()) {
             Student student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
-                Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы действительно хотите изменить статус выбранного студента на " + student.getNextStatus() + "?");
+                Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Вы действительно хотите изменить статус выбранного студента на " + student.getNextStatus() + "?");
                 if (option.isPresent()) {
                     if (option.get() == ButtonType.OK) {
                         String curStat = student.getStatus();
@@ -328,7 +359,7 @@ public class MainController extends BaseController implements Initializable {
                                     } catch (MessagingException e) {
                                         e.printStackTrace();
                                     }
-                                    option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы хотите удалить все данные данного студента? (почту, файлы)");
+                                    option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Вы хотите удалить все данные данного студента? (почту, файлы)");
                                     if (option.isPresent())
                                         if (option.get() == ButtonType.OK) {
                                             File file = new File(student.getFolderPath());
@@ -343,37 +374,41 @@ public class MainController extends BaseController implements Initializable {
                     }
                 }
             } else {
-                newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
+                newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента");
             }
         } else
-            changeUser();
+            changeUser();*/
     }
 
     public void changePersonal() {
-        Student student = studentsTable.getSelectionModel().getSelectedItem();
+        StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
         if (student != null) {
-            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, "Подтверждение", "Вы действительно хотите изменить персональные данные студента?");
+            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Вы действительно хотите изменить персональные данные студента?");
             if (option.isPresent())
                 if (option.get() == ButtonType.OK) {
                     newPersonalWindow(student);
                 }
         } else {
-            newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
+            newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента");
         }
     }
 
     public void getDialogWithStudent() {
-        if (signIn) {
-            Student student = studentsTable.getSelectionModel().getSelectedItem();
+        if (UserModel.getInstance().isLogged()) {
+            StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
                 chooseStageForDialog(student);
-            } else
-                newAlert(Alert.AlertType.ERROR, "Ошибка", "Вы не выбрали студента");
-        } else
-            changeUser();
+            } else newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента");
+        } else changeUser();
     }
 
     public void changeAutoMessages() {
-        showScene("../view/AutoMessagesView.fxml", "Auto-messages");
+        Stage stage = getScene("../views/AutoMessagesView.fxml", "Авто-сообщения");
+        if (stage != null) stage.showAndWait();
+    }
+
+    public void changeUser() {
+        Stage stage = getScene("../views/UserView.fxml", "Войдите в аккаунт");
+        if (stage != null) stage.showAndWait();
     }
 }

@@ -1,7 +1,6 @@
 package models;
 
-import entities.AutoMessageEntity;
-import entities.UserEntity;
+import entities.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.sqlite.JDBC;
@@ -41,16 +40,15 @@ public class DbHandler {
     private void executeUpdate(String sql) {
         try {
             Statement statement = this.connection.createStatement();
-            System.out.println(sql);
             statement.executeUpdate(sql);
-        } catch (SQLException ignored) {System.out.println(ignored);}
+        } catch (SQLException ignored) {}
     }
 
     /*---------------------------------------------------------
     --------------Students-------------------------------------
     ---------------------------------------------------------*/
 
-    public Student getStudent(String emailAddress) {
+    public StudentEntity getStudent(String emailAddress) {
         return getStudentFromResultSet(
                 executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
@@ -60,7 +58,7 @@ public class DbHandler {
         );
     }
 
-    public ObservableList<Student> getStudents() {
+    public ObservableList<StudentEntity> getStudents() {
         return getStudentsFromResultSet(
                 executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
@@ -69,7 +67,7 @@ public class DbHandler {
         );
     }
 
-    public void addStudent(Student student) {
+    public void addStudent(StudentEntity student) {
         executeUpdate(
                 "INSERT INTO Student(" +
                         "personal, " +
@@ -82,8 +80,8 @@ public class DbHandler {
                         "'" + student.getPersonal() + "'," +
                         "'" + student.getEmailAddress() + "'," +
                         "'" + student.getFolderPath() + "'," +
-                        student.getStageInt() + "," +
-                        student.getStatusInt() +
+                        student.getStage() + "," +
+                        student.getStatus() +
                         ")"
         );
     }
@@ -95,21 +93,21 @@ public class DbHandler {
         );
     }
 
-    public void updateStudent(Student student) {
+    public void updateStudent(StudentEntity student) {
         executeUpdate(
                 "UPDATE Student " +
                     "SET " +
                         "personal = '" + student.getPersonal() + "', " +
                         "folderPath = '" + student.getFolderPath() + "', " +
-                        "id_stage = " + student.getStageInt() + ", " +
-                        "id_status = " + student.getStatusInt() + ", " +
+                        "id_stage = " + student.getStage() + ", " +
+                        "id_status = " + student.getStatus() + ", " +
                         "fileCount = " + student.getFileCount() + " " +
-                    "WHERE `id` = " + student.getId()
+                    "WHERE id = " + student.getId()
         );
     }
 
     public void changeDir(File file) {
-        getStudents().forEach(student -> executeUpdate(
+        this.getStudents().forEach(student -> executeUpdate(
                 "UPDATE Student " +
                         "SET " +
                         "folderPath = '" + file.getPath() + "\\" + student.getEmailAddress() + "' " +
@@ -118,10 +116,10 @@ public class DbHandler {
         );
     }
 
-    private Student getStudentFromResultSet(ResultSet resultSet) {
+    private StudentEntity getStudentFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new Student(
+                return new StudentEntity(
                         resultSet.getInt("id"),
                         resultSet.getString("personal"),
                         resultSet.getString("emailAddress"),
@@ -130,13 +128,14 @@ public class DbHandler {
                         resultSet.getInt("id_status"),
                         resultSet.getInt("fileCount")
                 );
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
         return null;
     }
 
-    private ObservableList<Student> getStudentsFromResultSet(ResultSet resultSet) {
-        ObservableList<Student> students = FXCollections.observableArrayList();
+    private ObservableList<StudentEntity> getStudentsFromResultSet(ResultSet resultSet) {
+        ObservableList<StudentEntity> students = FXCollections.observableArrayList();
         if (resultSet != null) {
             try {
                 while (resultSet.next()) students.add(getStudentFromResultSet(resultSet));
@@ -147,14 +146,154 @@ public class DbHandler {
     }
 
     /*---------------------------------------------------------
-    --------------SignIn---------------------------------------
+    --------------Stage----------------------------------------
+    ---------------------------------------------------------*/
+
+    public StageEntity getStage(String id) {
+        return getStageFromResultSet(
+                executeQuery(
+                        "SELECT id, name " +
+                                "FROM Stage " +
+                                "WHERE id = " + id + ""
+                )
+        );
+    }
+
+    public ObservableList<StageEntity> getStages() {
+        return getStagesFromResultSet(
+                executeQuery(
+                        "SELECT id, name " +
+                                "FROM Stage"
+                )
+        );
+    }
+
+    public void addStage(StageEntity stage) {
+        executeUpdate(
+                "INSERT INTO Stage(name) " +
+                        "VALUES('" + stage.getName() + "')"
+        );
+    }
+
+    public void deleteStage(int id) {
+        executeUpdate(
+                "DELETE FROM Stage " +
+                        "WHERE id = " + id
+        );
+    }
+
+    public void updateStage(StageEntity stage) {
+        executeUpdate(
+                "UPDATE Stage " +
+                        "SET " +
+                        "name = '" + stage.getName() + "' " +
+                        "WHERE id = " + stage.getId()
+        );
+    }
+
+    private StageEntity getStageFromResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                return new StageEntity(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name")
+                );
+            } catch (SQLException ignored) {
+            }
+        }
+        return null;
+    }
+
+    private ObservableList<StageEntity> getStagesFromResultSet(ResultSet resultSet) {
+        ObservableList<StageEntity> stages = FXCollections.observableArrayList();
+        if (resultSet != null) {
+            try {
+                while (resultSet.next()) stages.add(getStageFromResultSet(resultSet));
+                if (!stages.isEmpty()) return stages;
+            } catch (SQLException ignored) {}
+        }
+        return null;
+    }
+
+    /*---------------------------------------------------------
+    --------------Status---------------------------------------
+    ---------------------------------------------------------*/
+
+    public StatusEntity getStatus(String id) {
+        return getStatusFromResultSet(
+                executeQuery(
+                        "SELECT id, name " +
+                                "FROM Status " +
+                                "WHERE id = " + id + ""
+                )
+        );
+    }
+
+    public ObservableList<StatusEntity> getStatuses() {
+        return getStatusesFromResultSet(
+                executeQuery(
+                        "SELECT id, name " +
+                                "FROM Status"
+                )
+        );
+    }
+
+    public void addStatus(StatusEntity status) {
+        executeUpdate(
+                "INSERT INTO Status(name) " +
+                        "VALUES('" + status.getName() + "')"
+        );
+    }
+
+    public void deleteStatus(int id) {
+        executeUpdate(
+                "DELETE FROM Status " +
+                        "WHERE id = " + id
+        );
+    }
+
+    public void updateStatus(StatusEntity status) {
+        executeUpdate(
+                "UPDATE Status " +
+                        "SET " +
+                        "name = '" + status.getName() + "' " +
+                        "WHERE id = " + status.getId()
+        );
+    }
+
+    private StatusEntity getStatusFromResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                return new StatusEntity(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name")
+                );
+            } catch (SQLException ignored) {
+            }
+        }
+        return null;
+    }
+
+    private ObservableList<StatusEntity> getStatusesFromResultSet(ResultSet resultSet) {
+        ObservableList<StatusEntity> statuses = FXCollections.observableArrayList();
+        if (resultSet != null) {
+            try {
+                while (resultSet.next()) statuses.add(getStatusFromResultSet(resultSet));
+                if (!statuses.isEmpty()) return statuses;
+            } catch (SQLException ignored) {}
+        }
+        return null;
+    }
+
+    /*---------------------------------------------------------
+    --------------User-----------------------------------------
     ---------------------------------------------------------*/
 
     public UserEntity getUser() {
         return getUserFromResultSet(
                 executeQuery(
                         "SELECT id, username, password, personal " +
-                                "FROM SignIn"
+                                "FROM User"
                 )
         );
     }
@@ -164,6 +303,15 @@ public class DbHandler {
         executeUpdate(
                 "INSERT INTO User(username, password, personal) " +
                     "VALUES('" + user.getUsername() + "','" + user.getPassword() + "','" + user.getPersonal() + "')"
+        );
+    }
+
+    public void updateUser(UserEntity user) {
+        executeUpdate(
+                "UPDATE User " +
+                        "SET " +
+                        "personal = '" + user.getPersonal() + "' " +
+                        "WHERE id = " + user.getId()
         );
     }
 
@@ -181,13 +329,14 @@ public class DbHandler {
     private UserEntity getUserFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new UserEntity(
-                        resultSet.getInt("id"),
-                        resultSet.getString("username"),
-                        resultSet.getString("passwords"),
-                        resultSet.getString("personal")
-                );
-            } catch (SQLException ignored) {}
+                if (resultSet.next())
+                    return new UserEntity(resultSet.getInt("id"),
+                            resultSet.getString("username"),
+                            resultSet.getString("password"),
+                            resultSet.getString("personal")
+                    );
+            } catch (SQLException ignored) {
+            }
         }
         return null;
     }

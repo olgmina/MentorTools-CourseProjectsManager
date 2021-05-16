@@ -1,5 +1,8 @@
 package models;
 
+import entities.StudentEntity;
+import entities.UserEntity;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -13,30 +16,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class YandexMail implements Mail {
-
-    private static String THEME_WRONG_STAGE                 = null;
-    private static String THEME_WRONG_FORMAT                = null;
-    private static String TEXT_STAGE_IS_ALREADY_COMPLETED   = null;
-    private static String TEXT_YOU_HAVE_NOT_DONE_STAGE      = null;
-    private static String TEXT_WRONG_FORMAT                 = null;
-    private static String TEXT_ANSWERED_ON_DATE             = null;
-
-    private final String IMAP_host = "imap.yandex.ru";
+public class YandexMailModel extends BaseModel implements Mail {
 
     private String fromEmail;
     private String password;
     private String personal;
+    private final String IMAP_host = "imap.yandex.ru";
+    private static YandexMailModel instance = null;
 
-    public YandexMail(String fromEmail, String password, String personal) throws MessagingException {
-        this.fromEmail = fromEmail;
-        this.password = password;
-        this.personal = personal;
-        getInbox();
+    public static synchronized YandexMailModel getInstance() throws MessagingException {
+        if (instance == null) {
+            instance = new YandexMailModel();
+        }
+        return instance;
     }
 
-    public void setAutoMessages(String[] messages) {
-        String[] messagesq = {"123","123"};
+    private YandexMailModel() throws MessagingException {
+        UserEntity user = DbHandler.getInstance().getUser();
+        if (user != null) {
+            this.fromEmail = user.getUsername();
+            this.password = user.getPassword();
+            this.personal = user.getPersonal();
+            getInbox();
+        }
+
     }
 
     private Folder getInbox() throws MessagingException {
@@ -93,8 +96,8 @@ public class YandexMail implements Mail {
         };
     }
 
-    private void saveFile(Student student, Message message, DbHandler dataBase) throws Exception {
-        File folder = new File(student.getFolderPath() + "\\" + student.getStageInt() + "\\" + student.getStatusInt());
+    private void saveFile(StudentEntity student, Message message, DbHandler dataBase) throws Exception {
+        File folder = new File(student.getFolderPath() + "\\" + student.getStage() + "\\" + student.getStatus());
         System.out.println(folder.mkdir());
         System.out.println(folder.mkdirs());
         MimeMultipart mp;
@@ -256,7 +259,7 @@ public class YandexMail implements Mail {
 
     @Override
     public void loadNotSeenInboxMessage(DbHandler dataBase, File rootFolder) {
-        try {
+        /*try {
             Folder inbox = getInbox();
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) {
@@ -323,7 +326,7 @@ public class YandexMail implements Mail {
             }
             messagesSetSeen();
         } catch (MessagingException ignored) {
-        }
+        }*/
     }
 
     @Override
@@ -343,54 +346,6 @@ public class YandexMail implements Mail {
     @Override
     public String getFromEmail() {
         return fromEmail;
-    }
-
-    public static String getThemeWrongStage() {
-        return THEME_WRONG_STAGE;
-    }
-
-    public static void setThemeWrongStage(String themeWrongStage) {
-        THEME_WRONG_STAGE = themeWrongStage;
-    }
-
-    public static String getThemeWrongFormat() {
-        return THEME_WRONG_FORMAT;
-    }
-
-    public static void setThemeWrongFormat(String themeWrongFormat) {
-        THEME_WRONG_FORMAT = themeWrongFormat;
-    }
-
-    public static String getTextStageIsAlreadyCompleted() {
-        return TEXT_STAGE_IS_ALREADY_COMPLETED;
-    }
-
-    public static void setTextStageIsAlreadyCompleted(String textStageIsAlreadyCompleted) {
-        TEXT_STAGE_IS_ALREADY_COMPLETED = textStageIsAlreadyCompleted;
-    }
-
-    public static String getTextYouHaveNotDoneStage() {
-        return TEXT_YOU_HAVE_NOT_DONE_STAGE;
-    }
-
-    public static void setTextYouHaveNotDoneStage(String textYouHaveNotDoneStage) {
-        TEXT_YOU_HAVE_NOT_DONE_STAGE = textYouHaveNotDoneStage;
-    }
-
-    public static String getTextWrongFormat() {
-        return TEXT_WRONG_FORMAT;
-    }
-
-    public static void setTextWrongFormat(String textWrongFormat) {
-        TEXT_WRONG_FORMAT = textWrongFormat;
-    }
-
-    public static String getTextAnsweredOnDate() {
-        return TEXT_ANSWERED_ON_DATE;
-    }
-
-    public static void setTextAnsweredOnDate(String textAnsweredOnDate) {
-        TEXT_ANSWERED_ON_DATE = textAnsweredOnDate;
     }
 }
 

@@ -20,6 +20,14 @@ public class UserModel extends BaseModel {
         dbHandler.insertUser(user);
     }
 
+    public void updateUser(UserEntity user) {
+        dbHandler.updateUser(user);
+    }
+
+    public void clearUser() {
+        dbHandler.clearUser();
+    }
+
     public boolean isLogged() {
         return dbHandler.isLogged();
     }
