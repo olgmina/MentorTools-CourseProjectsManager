@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class YandexMailModel extends BaseModel implements Mail {
+public class YandexMailModel extends BaseModel implements MailModel {
 
     private String fromEmail;
     private String password;

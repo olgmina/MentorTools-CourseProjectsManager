@@ -5,7 +5,7 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.util.ArrayList;
 
-public interface Mail {
+public interface MailModel {
     int notSeenMessagesCount();
     int inboxMessagesCount();
     void sendMessage(String toEmail, String subject, String body) throws MessagingException;
