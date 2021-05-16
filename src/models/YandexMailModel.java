@@ -397,7 +397,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                             else {
                                 //Ошибка, не завершен первый этап
                                 sendMessage(
-                                        student.getEmailAddress(),
+                                        messageFrom,
                                         autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
                                         autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", firstStage.getName()) + PostScriptum
                                 );
