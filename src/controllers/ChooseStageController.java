@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 public class ChooseStageController extends BaseController implements Initializable {
 
     public ListView<StageEntity> stageList;
+    public static StageEntity stage = null;
     public StageModel stageModel = StageModel.getInstance();
 
     @Override
@@ -19,6 +20,6 @@ public class ChooseStageController extends BaseController implements Initializab
     }
 
     public void saveAction() {
-        MainController.selectedStageForDialog = stageList.getSelectionModel().getSelectedItem() != null ? stageList.getSelectionModel().getSelectedItem() : null;
+        stage = stageList.getSelectionModel().getSelectedItem();
     }
 }
