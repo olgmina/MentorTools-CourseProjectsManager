@@ -21,4 +21,8 @@ public class StageEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String toString() {
+        return getName();
+    }
 }

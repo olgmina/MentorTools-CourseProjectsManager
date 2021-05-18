@@ -27,3 +27,5 @@ out
 .idea/dataSources.xml
 
 .DS_Store
+
+/src/resources/students/

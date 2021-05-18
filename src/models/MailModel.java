@@ -12,7 +12,7 @@ public interface MailModel {
     ArrayList<Message> getNotSeenInboxMessages();
     ArrayList<Message> getInboxMessages();
     ArrayList<Message> getInboxDialogMessages(String emailTo, String theme);
-    void deleteInboxDialogMessages(String emailTo);
+    void deleteInboxDialogMessages(String emailTo, String theme);
     void loadNotSeenInboxMessage(File rootFolder);
     void messagesSetSeen();
 }

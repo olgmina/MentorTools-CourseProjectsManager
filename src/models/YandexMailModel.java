@@ -14,10 +14,7 @@ import javax.mail.search.FlagTerm;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 public class YandexMailModel extends BaseModel implements MailModel {
 
@@ -40,13 +37,14 @@ public class YandexMailModel extends BaseModel implements MailModel {
 
     private YandexMailModel() throws MessagingException {
         UserEntity user = dataBaseModel.getUser();
-        this.fromEmail  = "example@yandex.ru";
-        this.password   = "password";
-        this.personal   = "personal";
         if (user != null) {
             this.fromEmail = user.getUsername();
             this.password  = user.getPassword();
             this.personal  = user.getPersonal();
+        } else {
+            this.fromEmail  = "example@yandex.ru";
+            this.password   = "password";
+            this.personal   = "personal";
         }
         getInbox();
     }
@@ -106,9 +104,9 @@ public class YandexMailModel extends BaseModel implements MailModel {
     }
 
     private void saveFile(StudentEntity student, Message message) throws Exception {
-        File folder = new File(student.getFolderPath() + "\\" + student.getStageId() + "\\" + student.getStatusId());
-        System.out.println(folder.mkdir());
-        System.out.println(folder.mkdirs());
+        File folder = new File(student.getFolderPath() + "\\" + student.getStage().getId() + "\\" + student.getStatus().getId());
+        folder.mkdir();
+        folder.mkdirs();
         MimeMultipart mp;
         try {
             mp = (MimeMultipart) message.getContent();
@@ -123,8 +121,8 @@ public class YandexMailModel extends BaseModel implements MailModel {
                         file.saveFile(folder.getPath());
                         student.setFileCount(student.getFileCount() + 1);
                         dataBaseModel.updateStudent(student);
-                        File thisFile = new File(folder + "\\" + file.getFileName());
-                        System.out.println(thisFile.renameTo(new File(folder.getPath() + "\\" + student.getFileCount() + file.getFileName())));
+                        File thisFile = new File(folder + File.separator + file.getFileName());
+                        thisFile.renameTo(new File(folder.getPath() + File.separator + student.getFileCount() + file.getFileName()));
                     }
                     else
                         throw new Exception();
@@ -208,12 +206,17 @@ public class YandexMailModel extends BaseModel implements MailModel {
     }
 
     @Override
-    public ArrayList<Message> getInboxDialogMessages(String emailTo, String... themes) {
+    public ArrayList<Message> getInboxDialogMessages(String emailTo, String theme) {
         ArrayList<Message> allMessages = getInboxMessages();
         ArrayList<Message> dialogMessages = new ArrayList<>();
         allMessages.forEach(message -> {
+            String messageTheme = EmailMessageReader.getSubject(message);
             Address[] addresses = null;
-            try { addresses = message.getRecipients(Message.RecipientType.TO); } catch (MessagingException e) { e.printStackTrace(); }
+            try {
+                addresses = message.getRecipients(Message.RecipientType.TO);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
             if (addresses != null) {
                 boolean isEmailTo = false;
                 boolean isEmailFrom = false;
@@ -223,23 +226,13 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     if (address.toString().equals(fromEmail))
                         isEmailFrom = true;
                 }
-                if (themes.length > 0) {
-                    for (String theme : themes)
-                        if ((EmailMessageReader.getFromEmailAddress(message).equals(emailTo) || (isEmailTo && isEmailFrom)) && (EmailMessageReader.getSubject(message).trim().toLowerCase().equals(theme.trim().toLowerCase()))) {
-                            try {
-                                if (!message.getFlags().contains(Flags.Flag.DELETED) )
-                                    dialogMessages.add(message);
-                            } catch (MessagingException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                } else
-                if (EmailMessageReader.getFromEmailAddress(message).equals(emailTo) || (isEmailTo && isEmailFrom)) {
-                    try {
-                        if (!message.getFlags().contains(Flags.Flag.DELETED))
+                if (isEmailTo && isEmailFrom) {
+                    if (theme != null) {
+                        if (messageTheme.equals(theme.toLowerCase().trim())) {
                             dialogMessages.add(message);
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
+                        }
+                    } else {
+                        dialogMessages.add(message);
                     }
                 }
             }
@@ -248,8 +241,8 @@ public class YandexMailModel extends BaseModel implements MailModel {
     }
 
     @Override
-    public void deleteInboxDialogMessages(String emailTo) {
-        ArrayList<Message> dialogMessages = getInboxDialogMessages(emailTo);
+    public void deleteInboxDialogMessages(String emailTo, String theme) {
+        ArrayList<Message> dialogMessages = getInboxDialogMessages(emailTo, theme);
         dialogMessages.forEach(message -> {
             try {
                 Message[] inboxMessages = getInbox().getMessages();
@@ -272,10 +265,10 @@ public class YandexMailModel extends BaseModel implements MailModel {
             Folder inbox = getInbox();
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) {
-                String messageStage = EmailMessageReader.getSubject(message).toLowerCase().trim();
-                String messageFrom  = EmailMessageReader.getFromEmailAddress(message);
-                String messagePersonal  = EmailMessageReader.getFromPersonal(message);
-                Date messageDate    = EmailMessageReader.getDate(message);
+                String messageStage    = EmailMessageReader.getSubject(message).toLowerCase().trim();
+                String messageFrom     = EmailMessageReader.getFromEmailAddress(message);
+                String messagePersonal = EmailMessageReader.getFromPersonal(message);
+                Date messageDate       = EmailMessageReader.getDate(message);
                 String PostScriptum = "\n\n" + autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_ANSWERED_ON_DATE).getText().replaceAll("#ДАТА_СООБЩЕНИЯ#", messageDate.toString());
                 StageEntity firstStage = stageModel.getFirstStage();
                 StageEntity lastStage = stageModel.getLastStage();
@@ -286,11 +279,11 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     StudentEntity student = studentModel.getStudent(messageFrom);
                     // Если написал существующий студент
                     if (student != null) {
-                        StageEntity currentStage = stageModel.getStage(student.getStageId());
+                        StageEntity currentStage = stageModel.getStage(student.getStage().getId());
                         // Если студент верно указал этап
                         if (messageStage.equals(currentStage.getName())) {
                             //Если этап не завершен
-                            if (student.getStatusId() != lastStatus.getId()) {
+                            if (student.getStatus().getId() != lastStatus.getId()) {
                                 try {
                                     //Сохранить файлы
                                     saveFile(student, message);
@@ -316,7 +309,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                         // Если студент неверно указал этап
                         else {
                             // Если текущий этап не завершен
-                            if (student.getStatusId() != lastStatus.getId()) {
+                            if (student.getStatus().getId() != lastStatus.getId()) {
                                 //Ошибка, не завершен текущий этап
                                 sendMessage(
                                         student.getEmailAddress(),
@@ -332,8 +325,8 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                     // Если указан следующий этап
                                     if (messageStage.equals(nextStage.getName())) {
                                         //Изменить этап на новый и скачать файлы в новую папку, изменить в бд
-                                        student.setStageId(nextStage.getId());
-                                        student.setStatusId(firstStatus.getId());
+                                        student.setStage(nextStage);
+                                        student.setStatus(firstStatus);
                                         studentModel.updateStudent(student);
                                         try {
                                             saveFile(student, message);
@@ -370,17 +363,17 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     }
                     // Если студент не добавлен
                     else {
-                        //Если явтор не преподаватель
+                        //Если автор не преподаватель
                         if (!messageFrom.equals(fromEmail)) {
                             //Если тема сообщения - первый этап
                             if (messageStage.equals(firstStage.getName())) {
                                 //Создать папку, скачать, добавить в бд.
-                                File folder = new File(rootFolder.getPath() + "\\" + EmailMessageReader.getFromEmailAddress(message) + "\\");
+                                File folder = new File(rootFolder.getPath() + File.separator + EmailMessageReader.getFromEmailAddress(message));
                                 String folderPath = folder.getPath();
-                                int stageId = stageModel.getFirstStage().getId();
-                                int statusId = statusModel.getFirstStatus().getId();
+                                StageEntity stage = stageModel.getFirstStage();
+                                StatusEntity status = statusModel.getFirstStatus();
                                 int fileCount = 0;
-                                studentModel.addStudent(new StudentEntity(0, messagePersonal, messageFrom, folderPath, stageId, statusId, fileCount));
+                                studentModel.addStudent(new StudentEntity(0, messagePersonal, messageFrom, folderPath, stage, status, fileCount));
                                 student = studentModel.getStudent(messageFrom);
                                 try {
                                     saveFile(student, message);
@@ -415,7 +408,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
     public void messagesSetSeen() {
         try {
             Folder inbox = getInbox();
-            inbox.open(Folder.READ_ONLY);
+            //inbox.open(Folder.READ_WRITE);
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) message.setFlag(Flags.Flag.SEEN, true);
             inbox.close();

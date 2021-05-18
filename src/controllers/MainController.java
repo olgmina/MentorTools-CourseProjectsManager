@@ -1,5 +1,6 @@
 package controllers;
 
+import entities.StageEntity;
 import entities.StudentEntity;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import models.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -31,7 +33,7 @@ public class MainController extends BaseController implements Initializable {
     public TableColumn<StudentEntity, String> FOLDER;
     public TableColumn<StudentEntity, String> STAGE;
     public TableColumn<StudentEntity, String> STATUS;
-    public TableColumn<StudentEntity, String> FILES;
+    public TableColumn<StudentEntity, Integer> FILES;
     public TextField toEmail;
     public TextField themeStage;
     public TextArea message;
@@ -41,9 +43,9 @@ public class MainController extends BaseController implements Initializable {
 
     private StudentModel studentModel = StudentModel.getInstance();
     private UserModel userModel = UserModel.getInstance();
-    private YandexMailModel yandexMailModel = YandexMailModel.getInstance();
+    public static StageEntity selectedStageForDialog = null;
 
-    public MainController() throws MessagingException {
+    public MainController() {
         if (!userModel.isLogged()) {
             changeUser();
         }
@@ -51,13 +53,18 @@ public class MainController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        rootFolder = new java.io.File("D:\\students\\");
+        rootFolder = new java.io.File(
+                System.getProperty("user.dir") + File.separator +
+                        "src" + File.separator +
+                        "resources" + File.separator +
+                        "students"
+        );
 
         studentsTable.setOnMouseClicked(e -> {
             try {
                 StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
                 toEmail.setText(student.getEmailAddress());
-                themeStage.setText(String.valueOf(student.getStageId()));
+                themeStage.setText(String.valueOf(student.getStage().getName()));
             } catch (NullPointerException ignore) {
             }
         });
@@ -80,7 +87,6 @@ public class MainController extends BaseController implements Initializable {
 
     }
 
-    //TODO: выбор статуса для диалога
     private void chooseStageForDialog(StudentEntity student) {
         /*GridPane grid = newGridScene(600, 150,3, 4, 30);
 
@@ -135,6 +141,22 @@ public class MainController extends BaseController implements Initializable {
             stageWindow.close();
         });
         stageWindow.showAndWait();*/
+        try {
+            selectedStageForDialog = null;
+            Stage stage = getScene("../views/ChooseStage.fxml", "Выбор этапа для просмотра сообщений с выбранным студентом");
+            if (stage != null) stage.showAndWait();
+            StringBuilder dialog = new StringBuilder();
+            ArrayList<Message> dialogMessages = YandexMailModel.getInstance().getInboxDialogMessages(student.getEmailAddress(), "Задание");
+
+            if (!dialogMessages.isEmpty()) {
+                for (Message dialogMessage : dialogMessages)
+                    dialog.append(EmailMessageReader.getShortMessage(dialogMessage));
+                textArea.setText(dialog.toString());
+            } else
+                newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_DIALOG_IS_EMPTY);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean deleteDirectory(File path) {
@@ -145,18 +167,18 @@ public class MainController extends BaseController implements Initializable {
                     if (file.isDirectory())
                         deleteDirectory(file);
                     else
-                        System.out.println(file.delete());
+                        file.delete();
                 }
         }
         return (path.delete());
-    }
+    } // ✓
 
     public void close() {
         Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_SURE_TO_QUIT);
         if (option.isPresent())
             if (option.get() == ButtonType.OK)
                 System.exit(200);
-    }
+    } // ✓
 
     public void inboxCount() {
         if (userModel.isLogged()) {
@@ -165,10 +187,10 @@ public class MainController extends BaseController implements Initializable {
             } catch (MessagingException e) {
                 newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
             }
+        } else {
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
         }
-        else
-            changeUser();
-    }
+    } // ✓
 
     public void inboxNotSeenCount() {
         if (userModel.isLogged()) {
@@ -177,10 +199,10 @@ public class MainController extends BaseController implements Initializable {
             } catch (MessagingException e) {
                 newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
             }
+        } else {
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
         }
-        else
-            changeUser();
-    }
+    } // ✓
 
     public void showNotSeenMessages() {
         if (userModel.isLogged()) {
@@ -198,7 +220,7 @@ public class MainController extends BaseController implements Initializable {
                 newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
             }
         } else {
-            changeUser();
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
         }
     }
 
@@ -214,7 +236,7 @@ public class MainController extends BaseController implements Initializable {
             }
             showAllStudents();
         } else {
-            changeUser();
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
         }
     }
 
@@ -264,14 +286,17 @@ public class MainController extends BaseController implements Initializable {
                     Optional<ButtonType> option1 = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Удалить папку студента?");
                     if (option1.isPresent())
                         if (option1.get() == ButtonType.OK)
-                            System.out.println(deleteDirectory(file));
+                            deleteDirectory(file);
                 }
-                Optional<ButtonType> option2 = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, "Удалить переписку со студентом?");
+                Optional<ButtonType> option2 = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_DELETE_DIALOG);
                 if (option2.isPresent())
                     if (option2.get() == ButtonType.OK) {
-                        YandexMailModel.getInstance().deleteInboxDialogMessages(student.getEmailAddress());
+                        if (userModel.isLogged())
+                            YandexMailModel.getInstance().deleteInboxDialogMessages(student.getEmailAddress(), null);
+                        else
+                            changeUser();
                     }
-                if (new File(student.getFolderPath()).exists() && YandexMailModel.getInstance().getInboxDialogMessages(student.getEmailAddress()).isEmpty()) {
+                if (new File(student.getFolderPath()).exists() && YandexMailModel.getInstance().getInboxDialogMessages(student.getEmailAddress(), null).isEmpty()) {
                     studentModel.deleteStudent(student.getId());
                     showAllStudents();
                 }
@@ -356,7 +381,7 @@ public class MainController extends BaseController implements Initializable {
                                     if (option.isPresent())
                                         if (option.get() == ButtonType.OK) {
                                             File file = new File(student.getFolderPath());
-                                            System.out.println(file.delete());
+                                            file.delete();
 
                                         }
                                 }
@@ -391,17 +416,28 @@ public class MainController extends BaseController implements Initializable {
             StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
                 chooseStageForDialog(student);
-            } else newAlert(Alert.AlertType.ERROR, ERROR, "Вы не выбрали студента");
-        } else changeUser();
+            } else newAlert(Alert.AlertType.ERROR, ERROR, ERROR_CHOOSE_STUDENT);
+        } else {
+            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
+        }
     }
 
     public void changeAutoMessages() {
         Stage stage = getScene("../views/AutoMessagesView.fxml", "Авто-сообщения");
         if (stage != null) stage.showAndWait();
-    }
+    } // ✓
 
     public void changeUser() {
+        if (userModel.isLogged()) {
+            Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_LOGGED_SURE_TO_QUIT_ACCOUNT);
+            if (option.isPresent()) {
+                if (option.get() != ButtonType.OK)
+                    return;
+            } else {
+                return;
+            }
+        }
         Stage stage = getScene("../views/UserView.fxml", "Войдите в аккаунт");
         if (stage != null) stage.showAndWait();
-    }
+    } // ✓
 }

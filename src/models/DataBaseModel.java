@@ -80,8 +80,8 @@ public class DataBaseModel {
                         "'" + student.getPersonal() + "'," +
                         "'" + student.getEmailAddress() + "'," +
                         "'" + student.getFolderPath() + "'," +
-                        student.getStageId() + "," +
-                        student.getStatusId() +
+                        student.getStage().getId() + "," +
+                        student.getStatus().getId() +
                         ")"
         );
     }
@@ -99,8 +99,8 @@ public class DataBaseModel {
                         "SET " +
                         "personal = '" + student.getPersonal() + "', " +
                         "folderPath = '" + student.getFolderPath() + "', " +
-                        "id_stage = " + student.getStageId() + ", " +
-                        "id_status = " + student.getStatusId() + ", " +
+                        "id_stage = " + student.getStage().getId() + ", " +
+                        "id_status = " + student.getStatus().getId() + ", " +
                         "fileCount = " + student.getFileCount() + " " +
                         "WHERE id = " + student.getId()
         );
@@ -119,15 +119,16 @@ public class DataBaseModel {
     private StudentEntity getStudentFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new StudentEntity(
-                        resultSet.getInt("id"),
-                        resultSet.getString("personal"),
-                        resultSet.getString("emailAddress"),
-                        resultSet.getString("folderPath"),
-                        resultSet.getInt("id_stage"),
-                        resultSet.getInt("id_status"),
-                        resultSet.getInt("fileCount")
-                );
+                if (resultSet.next())
+                    return new StudentEntity(
+                            resultSet.getInt("id"),
+                            resultSet.getString("personal"),
+                            resultSet.getString("emailAddress"),
+                            resultSet.getString("folderPath"),
+                            getStage(resultSet.getInt("id_stage")),
+                            getStatus(resultSet.getInt("id_status")),
+                            resultSet.getInt("fileCount")
+                    );
             } catch (SQLException ignored) {
             }
         }
@@ -172,10 +173,11 @@ public class DataBaseModel {
     public StageEntity getNextStage(StageEntity currentStage) {
         return getStageFromResultSet(
                 executeQuery(
-                        "SELECT TOP(1) id, name " +
+                        "SELECT id, name " +
                                 "FROM Stage " +
                                 "WHERE id > " + currentStage.getId() + "" +
-                                "ORDER BY id ASC"
+                                "ORDER BY id " +
+                                "LIMIT 1"
                 )
         );
     }
@@ -183,9 +185,10 @@ public class DataBaseModel {
     public StageEntity getFirstStage() {
         return getStageFromResultSet(
                 executeQuery(
-                        "SELECT TOP(1) id, name " +
+                        "SELECT id, name " +
                                 "FROM Stage " +
-                                "ORDER BY id ASC"
+                                "ORDER BY id " +
+                                "LIMIT 1"
                 )
         );
     }
@@ -193,9 +196,10 @@ public class DataBaseModel {
     public StageEntity getLastStage() {
         return getStageFromResultSet(
                 executeQuery(
-                        "SELECT TOP(1) id, name " +
+                        "SELECT id, name " +
                                 "FROM Stage " +
-                                "ORDER BY id DESC"
+                                "ORDER BY id DESC " +
+                                "LIMIT 1"
                 )
         );
     }
@@ -241,10 +245,11 @@ public class DataBaseModel {
     private StageEntity getStageFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new StageEntity(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                );
+                if (resultSet.next())
+                    return new StageEntity(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name")
+                    );
             } catch (SQLException ignored) {
             }
         }
@@ -279,9 +284,10 @@ public class DataBaseModel {
     public StatusEntity getFirstStatus() {
         return getStatusFromResultSet(
                 executeQuery(
-                        "SELECT TOP(1) id, name " +
+                        "SELECT id, name " +
                                 "FROM Status " +
-                                "ORDER BY id ASC"
+                                "ORDER BY id " +
+                                "LIMIT 1"
                 )
         );
     }
@@ -289,9 +295,10 @@ public class DataBaseModel {
     public StatusEntity getLastStatus() {
         return getStatusFromResultSet(
                 executeQuery(
-                        "SELECT TOP(1) id, name " +
+                        "SELECT id, name " +
                                 "FROM Status " +
-                                "ORDER BY id DESC"
+                                "ORDER BY id DESC " +
+                                "LIMIT 1"
                 )
         );
     }
@@ -331,10 +338,11 @@ public class DataBaseModel {
     private StatusEntity getStatusFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new StatusEntity(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name")
-                );
+                if (resultSet.next())
+                    return new StatusEntity(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name")
+                    );
             } catch (SQLException ignored) {
             }
         }
@@ -434,11 +442,12 @@ public class DataBaseModel {
     private AutoMessageEntity getAutoMessageFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                return new AutoMessageEntity(
-                        resultSet.getInt("id"),
-                        resultSet.getString("message_name"),
-                        resultSet.getString("message_text")
-                );
+                if (resultSet.next())
+                    return new AutoMessageEntity(
+                            resultSet.getInt("id"),
+                            resultSet.getString("message_name"),
+                            resultSet.getString("message_text")
+                    );
             } catch (SQLException ignored) {}
         }
         return null;

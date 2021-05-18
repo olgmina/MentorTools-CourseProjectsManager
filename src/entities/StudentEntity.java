@@ -1,22 +1,25 @@
 package entities;
 
+import models.StageModel;
+import models.StatusModel;
+
 public class StudentEntity {
 
     private final int id;
     private String personal;
     private final String emailAddress;
     private String folderPath;
-    private int stageId;
-    private int statusId;
+    private StageEntity stage;
+    private StatusEntity status;
     private int fileCount;
 
-    public StudentEntity(int id, String personal, String emailAddress, String folderPath, int stageId, int statusId, int fileCount) {
+    public StudentEntity(int id, String personal, String emailAddress, String folderPath, StageEntity stage, StatusEntity status, int fileCount) {
         this.id = id;
         this.personal = personal;
         this.emailAddress = emailAddress;
         this.folderPath = folderPath;
-        this.stageId = stageId;
-        this.statusId = statusId;
+        this.stage = stage;
+        this.status = status;
         this.fileCount = fileCount;
     }
 
@@ -44,20 +47,20 @@ public class StudentEntity {
         this.folderPath = folderPath;
     }
 
-    public int getStageId() {
-        return stageId;
+    public StageEntity getStage() {
+        return stage;
     }
 
-    public void setStageId(int stage) {
-        this.stageId = stage;
+    public void setStage(StageEntity stage) {
+        this.stage = stage;
     }
 
-    public int getStatusId() {
-        return statusId;
+    public StatusEntity getStatus() {
+        return status;
     }
 
-    public void setStatusId(int status) {
-        this.statusId = status;
+    public void setStatus(StatusEntity status) {
+        this.status = status;
     }
 
     public int getFileCount() {
