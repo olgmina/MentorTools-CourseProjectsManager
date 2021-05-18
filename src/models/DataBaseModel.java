@@ -10,7 +10,7 @@ import java.sql.*;
 
 public class DataBaseModel {
 
-    private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + "\\src\\resources\\DataBase";
+    private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + File.separator + "src" + File.separator + "resources" + File.separator + "DataBase";
     private static DataBaseModel instance = null;
     private Connection connection;
 
@@ -139,7 +139,17 @@ public class DataBaseModel {
         ObservableList<StudentEntity> students = FXCollections.observableArrayList();
         if (resultSet != null) {
             try {
-                while (resultSet.next()) students.add(getStudentFromResultSet(resultSet));
+                while (resultSet.next()) students.add(
+                        new StudentEntity(
+                                resultSet.getInt("id"),
+                                resultSet.getString("personal"),
+                                resultSet.getString("emailAddress"),
+                                resultSet.getString("folderPath"),
+                                getStage(resultSet.getInt("id_stage")),
+                                getStatus(resultSet.getInt("id_status")),
+                                resultSet.getInt("fileCount")
+                        )
+                );
                 if (!students.isEmpty()) return students;
             } catch (SQLException ignored) {}
         }
@@ -277,6 +287,18 @@ public class DataBaseModel {
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "WHERE id = " + id + ""
+                )
+        );
+    }
+
+    public StatusEntity getNextStatus(StatusEntity currentStatus) {
+        return getStatusFromResultSet(
+                executeQuery(
+                        "SELECT id, name " +
+                                "FROM Status " +
+                                "WHERE id > " + currentStatus.getId() + "" +
+                                "ORDER BY id " +
+                                "LIMIT 1"
                 )
         );
     }

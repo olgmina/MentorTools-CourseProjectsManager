@@ -21,6 +21,10 @@ public class StatusModel extends BaseModel {
         return dataBaseModel.getStatus(id);
     }
 
+    public StatusEntity getNextStatus(StatusEntity currentStatus) {
+        return dataBaseModel.getNextStatus(currentStatus);
+    }
+
     public StatusEntity getFirstStatus() {
         return dataBaseModel.getFirstStatus();
     }

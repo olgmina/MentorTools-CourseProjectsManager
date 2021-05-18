@@ -27,20 +27,20 @@
                 <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Label text="Неверный выбор этапа (тема): " GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label text="Неверный формат (тема): " GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label text="Этап уже завершен (текст): " GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <Label text="Не завершен один из предыдущих этапов (текст): " GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                <Label text="Неверный формат (текст): " GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                <Label text="Пропуск этапа (текст): " GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                <Label text="КП завершен (текст): " GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <Label text="Тема ответа: " GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Этап уже завершен: " GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="Не завершен текущий этап: " GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label text="Неверный формат: " GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="Пропуск этапа(ов): " GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <Label text="КП завершен: " GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <Label text="Статус изменен: " GridPane.columnIndex="1" GridPane.rowIndex="7" />
                 <Label text="PS: " GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                <TextArea fx:id="THEME_WRONG_STAGE" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                <TextArea fx:id="THEME" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="5.0" />
                     </GridPane.margin>
                 </TextArea>
-                <TextArea fx:id="THEME_WRONG_FORMAT" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                <TextArea fx:id="TEXT_STAGE_IS_ALREADY_COMPLETED" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="5.0" />
                     </GridPane.margin>
@@ -55,17 +55,17 @@
                         <Insets bottom="5.0" top="5.0" />
                     </GridPane.margin>
                 </TextArea>
-                <TextArea fx:id="TEXT_STAGE_IS_ALREADY_COMPLETED" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                <TextArea fx:id="TEXT_NOT_NEXT_STAGE" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="5">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="5.0" />
                     </GridPane.margin>
                 </TextArea>
-                <TextArea fx:id="TEXT_NOT_NEXT_STAGE" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                <TextArea fx:id="TEXT_COURSE_PROJECT_COMPLETED" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="6">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="5.0" />
                     </GridPane.margin>
                 </TextArea>
-                <TextArea fx:id="TEXT_COURSE_PROJECT_COMPLETED" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                <TextArea fx:id="TEXT_STATUS_CHANGED" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="7">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="5.0" />
                     </GridPane.margin>

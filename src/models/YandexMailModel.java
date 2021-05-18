@@ -4,6 +4,8 @@ import entities.StageEntity;
 import entities.StatusEntity;
 import entities.StudentEntity;
 import entities.UserEntity;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -18,7 +20,7 @@ import java.util.*;
 
 public class YandexMailModel extends BaseModel implements MailModel {
 
-    private String fromEmail;
+    private String yandexEmail;
     private String password;
     private String personal;
     private final String IMAP_host = "imap.yandex.ru";
@@ -38,11 +40,11 @@ public class YandexMailModel extends BaseModel implements MailModel {
     private YandexMailModel() throws MessagingException {
         UserEntity user = dataBaseModel.getUser();
         if (user != null) {
-            this.fromEmail = user.getUsername();
+            this.yandexEmail = user.getUsername();
             this.password  = user.getPassword();
             this.personal  = user.getPersonal();
         } else {
-            this.fromEmail  = "example@yandex.ru";
+            this.yandexEmail = "example@yandex.ru";
             this.password   = "password";
             this.personal   = "personal";
         }
@@ -55,7 +57,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
         Session session = Session.getDefaultInstance(props, authenticator);
         session.setDebug(false);
         Store store = session.getStore();
-        store.connect(IMAP_host, fromEmail, password);
+        store.connect(IMAP_host, yandexEmail, password);
         Folder inbox = store.getFolder("INBOX");
         inbox.open(Folder.READ_WRITE);
         return inbox;
@@ -73,7 +75,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
         Properties props = System.getProperties();
         String host = "smtp.yandex.ru";
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.user", fromEmail);
+        props.put("mail.smtp.user", yandexEmail);
         props.put("mail.smtp.password", password);
         props.put("mail.smtp.port", "465");
         props.put("mail.smtp.auth", "true");
@@ -98,13 +100,13 @@ public class YandexMailModel extends BaseModel implements MailModel {
         return new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(fromEmail, password);
+                return new PasswordAuthentication(yandexEmail, password);
             }
         };
     }
 
     private void saveFile(StudentEntity student, Message message) throws Exception {
-        File folder = new File(student.getFolderPath() + "\\" + student.getStage().getId() + "\\" + student.getStatus().getId());
+        File folder = new File(student.getFolderPath() + File.separator + student.getStage() + File.separator + student.getStatus());
         folder.mkdir();
         folder.mkdirs();
         MimeMultipart mp;
@@ -135,26 +137,12 @@ public class YandexMailModel extends BaseModel implements MailModel {
 
     @Override
     public int notSeenMessagesCount() {
-        ArrayList<Message> messages = new ArrayList<>();
-        try {
-            Folder inbox = getInbox();
-            messages.addAll(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-        return messages.size();
+        return getNotSeenInboxMessages().size();
     }
 
     @Override
     public int inboxMessagesCount() {
-        ArrayList<Message> messages = new ArrayList<>();
-        try {
-            Folder inbox = getInbox();
-            messages.addAll(Arrays.asList(inbox.getMessages()));
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        }
-        return messages.size();
+        return getInboxMessages().size();
     }
 
     @Override
@@ -164,11 +152,11 @@ public class YandexMailModel extends BaseModel implements MailModel {
         session.setDebug(false);
         MimeMessage message = new MimeMessage(session);
         try {
-            InternetAddress address = new InternetAddress(fromEmail);
+            InternetAddress address = new InternetAddress(yandexEmail);
             address.setPersonal(personal);
             message.setFrom(address);
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(fromEmail)); //ЭТО ВАЖНО, ТАК КАК ЯНДЕКС ОТПРАВЛЯЕТ СООБЩЕНИЯ ПО SMTP, А ДАННЫЙ ПРОТОКОЛ НЕ ОСТАВЛЯЕТ ПОСЛЕ СЕБЯ КОПИИ СООБЩЕНИЙ. НЕ ДОБАВЛЯЕТ ИХ В ОТПРАВЛЕННЫЕ
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(yandexEmail)); //ЭТО ВАЖНО, ТАК КАК ЯНДЕКС ОТПРАВЛЯЕТ СООБЩЕНИЯ ПО SMTP, А ДАННЫЙ ПРОТОКОЛ НЕ ОСТАВЛЯЕТ ПОСЛЕ СЕБЯ КОПИИ СООБЩЕНИЙ. НЕ ДОБАВЛЯЕТ ИХ В ОТПРАВЛЕННЫЕ
             message.setSubject(subject);
 
             Multipart multipart = new MimeMultipart();
@@ -177,7 +165,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
             multipart.addBodyPart(textBody);
             message.setContent(multipart);
             Transport transport = session.getTransport("smtp");
-            transport.connect(props.getProperty("mail.smtp.host"), fromEmail, password);
+            transport.connect(props.getProperty("mail.smtp.host"), yandexEmail, password);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
         } catch (UnsupportedEncodingException e) {
@@ -191,6 +179,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
         try {
             Folder inbox = getInbox();
             messages.addAll(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
+            inbox.close();
         } catch (MessagingException ignored) { }
         return messages;
     }
@@ -201,6 +190,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
         try {
             Folder inbox = getInbox();
             messages.addAll(Arrays.asList(inbox.getMessages()));
+            inbox.close();
         } catch (MessagingException ignored) { }
         return messages;
     }
@@ -223,7 +213,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                 for (Address address : addresses) {
                     if (address.toString().equals(emailTo))
                         isEmailTo = true;
-                    if (address.toString().equals(fromEmail))
+                    if (address.toString().equals(yandexEmail))
                         isEmailFrom = true;
                 }
                 if (isEmailTo && isEmailFrom) {
@@ -280,6 +270,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     // Если написал существующий студент
                     if (student != null) {
                         StageEntity currentStage = stageModel.getStage(student.getStage().getId());
+                        StageEntity nextStage = stageModel.getNextStage(currentStage);
                         // Если студент верно указал этап
                         if (messageStage.equals(currentStage.getName())) {
                             //Если этап не завершен
@@ -291,19 +282,31 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                     //Ошибка, формат файла
                                     sendMessage(
                                             student.getEmailAddress(),
-                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_FORMAT).getText(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
                                             autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_WRONG_FORMAT).getText() + PostScriptum
                                     );
                                 }
                             }
                             //Если этап завершен
                             else {
-                                //Ошибка, этап уже завершен
-                                sendMessage(
-                                        student.getEmailAddress(),
-                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
-                                        autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_STAGE_IS_ALREADY_COMPLETED).getText().replaceAll("#УКАЗАННЫЙ_ЭТАП#", messageStage) + PostScriptum
-                                );
+                                //Если существует следующий этап
+                                if (nextStage == null) {
+                                    //Ошибка, курсовой проект завершен
+                                    sendMessage(
+                                            student.getEmailAddress(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_COURSE_PROJECT_COMPLETED).getText() + PostScriptum
+                                    );
+                                }
+                                //Если следующего этапа не существует
+                                else {
+                                    //Ошибка, этап уже завершен
+                                    sendMessage(
+                                            student.getEmailAddress(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_STAGE_IS_ALREADY_COMPLETED).getText().replaceAll("#УКАЗАННЫЙ_ЭТАП#", currentStage.getName()).replaceAll("#СЛЕДУЮЩИЙ_ЭТАП#", nextStage.getName()) + PostScriptum
+                                    );
+                                }
                             }
                         }
                         // Если студент неверно указал этап
@@ -313,13 +316,12 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                 //Ошибка, не завершен текущий этап
                                 sendMessage(
                                         student.getEmailAddress(),
-                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
                                         autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()) + PostScriptum
                                 );
                             }
                             // Если текущий этап завершен
                             else {
-                                StageEntity nextStage = stageModel.getNextStage(currentStage);
                                 //Если существует следующий этап
                                 if (nextStage != null) {
                                     // Если указан следующий этап
@@ -334,7 +336,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                             //Ошибка, формат файла
                                             sendMessage(
                                                     student.getEmailAddress(),
-                                                    autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_FORMAT).getText(),
+                                                    autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
                                                     autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_WRONG_FORMAT).getText() + PostScriptum
                                             );
                                         }
@@ -344,7 +346,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                         //Ошибка, пропуск этапа
                                         sendMessage(
                                                 student.getEmailAddress(),
-                                                autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                                autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
                                                 autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_NOT_NEXT_STAGE).getText().replaceAll("#СЛЕДУЮЩИЙ_ЭТАП#", nextStage.getName()) + PostScriptum
                                         );
                                     }
@@ -354,7 +356,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                     //Ошибка, курсовой проект завершен
                                     sendMessage(
                                             student.getEmailAddress(),
-                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()),
                                             autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_COURSE_PROJECT_COMPLETED).getText() + PostScriptum
                                     );
                                 }
@@ -364,7 +366,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     // Если студент не добавлен
                     else {
                         //Если автор не преподаватель
-                        if (!messageFrom.equals(fromEmail)) {
+                        if (!messageFrom.equals(yandexEmail)) {
                             //Если тема сообщения - первый этап
                             if (messageStage.equals(firstStage.getName())) {
                                 //Создать папку, скачать, добавить в бд.
@@ -381,7 +383,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                     //Ошибка, формат файла
                                     sendMessage(
                                             student.getEmailAddress(),
-                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_FORMAT).getText(),
+                                            autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", messageStage),
                                             autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_WRONG_FORMAT).getText() + PostScriptum
                                     );
                                 }
@@ -391,7 +393,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                                 //Ошибка, не завершен первый этап
                                 sendMessage(
                                         messageFrom,
-                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME_WRONG_STAGE).getText(),
+                                        autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", messageStage),
                                         autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_YOU_HAVE_NOT_DONE_STAGE).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", firstStage.getName()) + PostScriptum
                                 );
                             }
@@ -399,8 +401,24 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     }
                 }
             }
+            inbox.close();
             messagesSetSeen();
         } catch (MessagingException ignored) {
+        }
+    }
+
+    @Override
+    public void changeStatus(StudentEntity student, StatusEntity nextStatus) {
+        StageEntity currentStage   = student.getStage();
+        StatusEntity currentStatus = student.getStatus();
+        try {
+            sendMessage(
+                    student.getEmailAddress(),
+                    autoMessageModel.getAutoMessage(AutoMessageModel.THEME).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", student.getStage().getName()),
+                    autoMessageModel.getAutoMessage(AutoMessageModel.TEXT_STATUS_CHANGED).getText().replaceAll("#ТЕКУЩИЙ_ЭТАП#", currentStage.getName()).replaceAll("#ТЕКУЩИЙ_СТАТУС#", currentStatus.getName()).replaceAll("#СЛЕДУЮЩИЙ_СТАТУС#", nextStatus.getName())
+            );
+        } catch (MessagingException e) {
+            e.printStackTrace();
         }
     }
 
@@ -408,7 +426,6 @@ public class YandexMailModel extends BaseModel implements MailModel {
     public void messagesSetSeen() {
         try {
             Folder inbox = getInbox();
-            //inbox.open(Folder.READ_WRITE);
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) message.setFlag(Flags.Flag.SEEN, true);
             inbox.close();

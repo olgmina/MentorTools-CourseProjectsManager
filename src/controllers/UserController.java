@@ -21,7 +21,7 @@ public class UserController extends BaseController implements Initializable {
     public TextField password;
     public Label mailDomain;
 
-    public YandexMailModel yandexMail = null;
+    public static YandexMailModel yandexMail = null;
     public static UserModel userModel        = UserModel.getInstance();
 
     @Override
@@ -36,6 +36,7 @@ public class UserController extends BaseController implements Initializable {
             yandexMail = YandexMailModel.getInstance();
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_LOGIN);
         } catch (MessagingException e) {
+            yandexMail = null;
             userModel.clearUser();
             newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
         }
