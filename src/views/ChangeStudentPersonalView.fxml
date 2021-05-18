@@ -20,7 +20,7 @@
             </rowConstraints>
             <children>
                 <Label text="Персональные данные: " GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="studentPersonal" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <TextField fx:id="studentPersonal" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             </children>
         </GridPane>
     </center>

@@ -4,8 +4,6 @@ import entities.StageEntity;
 import entities.StatusEntity;
 import entities.StudentEntity;
 import entities.UserEntity;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -16,19 +14,22 @@ import javax.mail.search.FlagTerm;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
 
 public class YandexMailModel extends BaseModel implements MailModel {
 
-    private String yandexEmail;
-    private String password;
-    private String personal;
+    private final String yandexEmail;
+    private final String password;
+    private final String personal;
     private final String IMAP_host = "imap.yandex.ru";
     private static YandexMailModel instance = null;
-    private StageModel stageModel = StageModel.getInstance();
-    private StatusModel statusModel = StatusModel.getInstance();
-    private StudentModel studentModel = StudentModel.getInstance();
-    private AutoMessageModel autoMessageModel = AutoMessageModel.getInstance();
+    private final StageModel stageModel = StageModel.getInstance();
+    private final StatusModel statusModel = StatusModel.getInstance();
+    private final StudentModel studentModel = StudentModel.getInstance();
+    private final AutoMessageModel autoMessageModel = AutoMessageModel.getInstance();
 
     public static synchronized YandexMailModel getInstance() throws MessagingException {
         if (instance == null) {

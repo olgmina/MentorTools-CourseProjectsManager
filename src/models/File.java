@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class File {
 
-    private MimeBodyPart mimeBodyPart;
+    private final MimeBodyPart mimeBodyPart;
 
     File(MimeBodyPart mimeBodyPart) {
         this.mimeBodyPart = mimeBodyPart;

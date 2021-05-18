@@ -44,46 +44,46 @@
             </columns>
         </TableView>
     </center>
-   <right>
-       <VBox prefHeight="570.0" prefWidth="309.0" BorderPane.alignment="CENTER">
-           <TextArea fx:id="textArea" prefHeight="351.0" prefWidth="422.0" />
-           <GridPane alignment="CENTER" prefHeight="230.0" prefWidth="547.0">
-               <columnConstraints>
-                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="148.40000762939454" />
-                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="608.0" minWidth="10.0" prefWidth="273.99999237060547" />
-               </columnConstraints>
-               <rowConstraints>
-                   <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                   <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                   <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                   <RowConstraints maxHeight="100.0" minHeight="10.0" prefHeight="100.0" valignment="TOP" vgrow="SOMETIMES" />
-                   <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
-               </rowConstraints>
-               <Label text="Отправить сообщение" GridPane.columnIndex="1">
-                   <font>
-                       <Font size="18.0" />
-                   </font>
-               <GridPane.margin>
-                  <Insets left="10.0" right="10.0" />
-               </GridPane.margin>
-               </Label>
-               <Label text="Кому" GridPane.rowIndex="1" />
-               <Label text="Тема" GridPane.rowIndex="2" />
-               <Label text="Сообщение" GridPane.rowIndex="3" />
-               <TextField fx:id="toEmail" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <GridPane.margin>
-                  <Insets left="10.0" right="10.0" />
-               </GridPane.margin></TextField>
-               <TextField fx:id="themeStage" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets left="10.0" right="10.0" />
-               </GridPane.margin></TextField>
-               <TextArea fx:id="message" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets left="10.0" right="10.0" />
-               </GridPane.margin></TextArea>
-               <Button mnemonicParsing="false" onAction="#sendEmail" text="Отправить" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-           </GridPane>
-       </VBox>
-   </right>
+    <right>
+        <VBox prefHeight="570.0" prefWidth="309.0" BorderPane.alignment="CENTER">
+            <TextArea fx:id="textArea" prefHeight="351.0" prefWidth="422.0" />
+            <GridPane alignment="CENTER" prefHeight="230.0" prefWidth="547.0">
+                <columnConstraints>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="345.0" minWidth="10.0" prefWidth="148.40000762939454" />
+                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="608.0" minWidth="10.0" prefWidth="273.99999237060547" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="100.0" minHeight="10.0" prefHeight="100.0" valignment="TOP" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
+                </rowConstraints>
+                <Label text="Отправить сообщение" GridPane.columnIndex="1">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                    <GridPane.margin>
+                        <Insets left="10.0" right="10.0" />
+                    </GridPane.margin>
+                </Label>
+                <Label text="Кому" GridPane.rowIndex="1" />
+                <Label text="Тема" GridPane.rowIndex="2" />
+                <Label text="Сообщение" GridPane.rowIndex="3" />
+                <TextField fx:id="toEmail" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <GridPane.margin>
+                        <Insets left="10.0" right="10.0" />
+                    </GridPane.margin></TextField>
+                <TextField fx:id="themeStage" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <GridPane.margin>
+                        <Insets left="10.0" right="10.0" />
+                    </GridPane.margin></TextField>
+                <TextArea fx:id="message" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                    <GridPane.margin>
+                        <Insets left="10.0" right="10.0" />
+                    </GridPane.margin></TextArea>
+                <Button mnemonicParsing="false" onAction="#sendEmail" text="Отправить" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            </GridPane>
+        </VBox>
+    </right>
 </BorderPane>

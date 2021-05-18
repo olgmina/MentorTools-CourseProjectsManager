@@ -1,6 +1,5 @@
 package controllers;
 
-import entities.StageEntity;
 import entities.StatusEntity;
 import entities.StudentEntity;
 import javafx.collections.ObservableList;
@@ -44,8 +43,8 @@ public class MainController extends BaseController implements Initializable {
     private ObservableList<StudentEntity> students = null;
     private File rootFolder;
 
-    private StudentModel studentModel = StudentModel.getInstance();
-    private UserModel userModel = UserModel.getInstance();
+    private final StudentModel studentModel = StudentModel.getInstance();
+    private final UserModel userModel = UserModel.getInstance();
 
     public MainController() {
         if (!userModel.isLogged()) {
