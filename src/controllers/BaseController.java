@@ -18,6 +18,7 @@ public abstract class BaseController {
     public final String ERROR_WRONG_LOGIN_OR_PASSWORD            = "Неверный логин / пароль \n или нестабильное интернет соединение";
     public final String ERROR_SOMETHING_GOING_WRONG              = "Что-то пошло не так";
     public final String ERROR_MESSAGE_NOT_SENT                   = "Сообщение не было отправлено";
+    public final String ERROR_REQUIRED_FIELDS                    = "Заполните все обязательные поля";
     // Информация
     public final String INFORMATION                              = "Информация";
     public final String INFORMATION_NO_UNREAD_MESSAGES           = "У вас нет непрочитанных сообщений \nили нестабильное интернет соединение";

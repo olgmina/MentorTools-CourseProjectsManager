@@ -9,16 +9,18 @@
         <GridPane BorderPane.alignment="CENTER">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="320.0" minWidth="320.0" prefWidth="320.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="440.0" minWidth="440.0" prefWidth="440.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="150.0" minHeight="150.0" prefHeight="150.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <ListView fx:id="stageList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Персональные данные: " GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="studentPersonal" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             </children>
         </GridPane>
     </center>
@@ -31,7 +33,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Выбор этапа" textAlignment="CENTER">
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Изменить персональные данные" textAlignment="CENTER">
                     <font>
                         <Font size="16.0" />
                     </font>
@@ -43,7 +45,8 @@
         <GridPane BorderPane.alignment="CENTER">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="685.0" minWidth="350.0" prefWidth="683.0" />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="410.4" minWidth="75.39999999999998" prefWidth="77.39999999999998" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
             </columnConstraints>
             <rowConstraints>
@@ -51,7 +54,8 @@
                 <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <Button mnemonicParsing="false" onAction="#saveAction" text="Выбрать" GridPane.columnIndex="1" />
+                <Button mnemonicParsing="false" onAction="#saveAction" text="Сохранить" GridPane.columnIndex="2" />
+                <Label fx:id="message" GridPane.columnIndex="1" />
             </children>
         </GridPane>
     </bottom>
