@@ -9,10 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import models.EmailMessageReader;
-import models.StatusModel;
-import models.StudentModel;
-import models.UserModel;
+import models.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -43,12 +40,16 @@ public class MainController extends BaseController implements Initializable {
     private ObservableList<StudentEntity> students = null;
     private File rootFolder;
 
-    private final StudentModel studentModel = StudentModel.getInstance();
-    private final UserModel userModel = UserModel.getInstance();
-
     public MainController() {
-        if (!userModel.isLogged()) {
+        if (!UserModel.getInstance().isLogged()) {
             changeUser();
+        } else {
+            try {
+                UserController.yandexMailModel = YandexMailModel.getInstance();
+            } catch (MessagingException e) {
+                UserController.yandexMailModel = null;
+                newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            }
         }
     }
 
@@ -72,7 +73,7 @@ public class MainController extends BaseController implements Initializable {
 
         textArea.setEditable(false);
 
-        students = studentModel.getStudents();
+        students = StudentModel.getInstance().getStudents();
         ID.setCellValueFactory(new PropertyValueFactory<>("id"));
         PERSONAL.setCellValueFactory(new PropertyValueFactory<>("personal"));
         EMAIL.setCellValueFactory(new PropertyValueFactory<>("emailAddress"));
@@ -84,7 +85,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void chooseStageForDialog(StudentEntity student) {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             Stage stage = getScene("../views/ChooseStageView.fxml", "Выбор этапа для просмотра сообщений с выбранным студентом");
             if (stage != null) stage.showAndWait();
             StringBuilder dialog = new StringBuilder();
@@ -124,7 +125,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void inboxCount() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, UserController.yandexMailModel.inboxMessagesCount() + " входящих сообщений. \n(" + UserController.yandexMailModel.notSeenMessagesCount() + " непрочитанных)");
         } else {
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
@@ -133,7 +134,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void inboxNotSeenCount() {
-        if (UserController.yandexMailModel != null || userModel.isLogged()) {
+        if (UserController.yandexMailModel != null || UserModel.getInstance().isLogged()) {
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, UserController.yandexMailModel.notSeenMessagesCount() + " непрочитанных сообщений");
         } else {
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
@@ -142,7 +143,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void showNotSeenMessages() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             if (UserController.yandexMailModel.notSeenMessagesCount() > 0) {
                 ArrayList<Message> messages = UserController.yandexMailModel.getNotSeenInboxMessages();
                 textArea.setText("");
@@ -159,7 +160,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void loadNotSeenMessages() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             if (UserController.yandexMailModel.notSeenMessagesCount() > 0) {
                 UserController.yandexMailModel.loadNotSeenInboxMessage(rootFolder);
             } else
@@ -171,7 +172,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void yandexQuit() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_SURE_TO_QUIT_ACCOUNT);
             if (option.isPresent())
                 if (option.get() == ButtonType.OK)
@@ -183,7 +184,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void sendEmail() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             if (message.getText().isEmpty()) {
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_EMPTY_MESSAGE);
             } else if (toEmail.getText().isEmpty() || themeStage.getText().isEmpty()) {
@@ -203,7 +204,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void showAllStudents() {
-        students = studentModel.getStudents();
+        students = StudentModel.getInstance().getStudents();
         if (students == null) {
             studentsTable.getItems().clear();
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_STUDENTS);
@@ -223,22 +224,20 @@ public class MainController extends BaseController implements Initializable {
                         deleteDirectory(file);
             }
 
-            if (UserController.yandexMailModel != null && userModel.isLogged()) {
+            if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
                 Optional<ButtonType> option2 = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_DELETE_DIALOG);
                 if (option2.isPresent())
                     if (option2.get() == ButtonType.OK) {
-                        if (userModel.isLogged())
-                            UserController.yandexMailModel.deleteInboxDialogMessages(student.getEmailAddress(), null);
-                        else
-                            changeUser();
+                        UserController.yandexMailModel.deleteInboxDialogMessages(student.getEmailAddress(), null);
                     }
-                if (fileExists && UserController.yandexMailModel.getInboxDialogMessages(student.getEmailAddress(), null).isEmpty()) {
-                    studentModel.deleteStudent(student.getId());
-                    showAllStudents();
-                }
             } else {
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
                 changeUser();
+            }
+
+            if (!fileExists && UserController.yandexMailModel.getInboxDialogMessages(student.getEmailAddress(), null).isEmpty()) {
+                StudentModel.getInstance().deleteStudent(student.getId());
+                showAllStudents();
             }
         } else {
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_CHOOSE_STUDENT);
@@ -258,7 +257,7 @@ public class MainController extends BaseController implements Initializable {
                 if (fileChooser.showOpenDialog(new JButton()) == JFileChooser.APPROVE_OPTION) {
                     rootFolder = fileChooser.getSelectedFile();
                     if (rootFolder != null) {
-                        studentModel.changeDir(rootFolder);
+                        StudentModel.getInstance().changeDir(rootFolder);
                         showAllStudents();
                     }
                 }
@@ -281,7 +280,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void changeStatus() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
                 StatusEntity currentStatus = student.getStatus();
@@ -290,10 +289,10 @@ public class MainController extends BaseController implements Initializable {
                     Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_CHANGE_STATUS.replaceAll("#ТЕКУЩИЙ_СТАТУС#", currentStatus.getName()).replaceAll("#СЛЕДУЮЩИЙ_СТАТУС#", nextStatus.getName()));
                     if (option.isPresent()) {
                         if (option.get() == ButtonType.OK) {
-                            if (UserController.yandexMailModel != null && userModel.isLogged()) {
+                            if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
                                 UserController.yandexMailModel.changeStatus(student, nextStatus);
                                 student.setStatus(nextStatus);
-                                studentModel.updateStudent(student);
+                                StudentModel.getInstance().updateStudent(student);
                                 showAllStudents();
                             } else {
                                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
@@ -325,7 +324,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void getDialogWithStudent() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
             if (student != null) {
                 chooseStageForDialog(student);
@@ -342,7 +341,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void changeUser() {
-        if (UserController.yandexMailModel != null && userModel.isLogged()) {
+        if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             Optional<ButtonType> option = newAlert(Alert.AlertType.CONFIRMATION, CONFIRMATION, CONFIRMATION_LOGGED_SURE_TO_QUIT_ACCOUNT);
             if (option.isPresent()) {
                 if (option.get() != ButtonType.OK)
@@ -350,11 +349,8 @@ public class MainController extends BaseController implements Initializable {
             } else {
                 return;
             }
-            Stage stage = getScene("../views/UserView.fxml", "Войдите в аккаунт");
-            if (stage != null) stage.showAndWait();
-        } else {
-            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_USER);
-            changeUser();
         }
+        Stage stage = getScene("../views/UserView.fxml", "Войдите в аккаунт");
+        if (stage != null) stage.showAndWait();
     }
 }

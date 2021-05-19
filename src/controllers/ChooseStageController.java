@@ -12,11 +12,10 @@ public class ChooseStageController extends BaseController implements Initializab
 
     public ListView<StageEntity> stageList;
     public static StageEntity stage = null;
-    public StageModel stageModel = StageModel.getInstance();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        stageList.setItems(stageModel.getStages());
+        stageList.setItems(StageModel.getInstance().getStages());
     }
 
     public void saveAction() {

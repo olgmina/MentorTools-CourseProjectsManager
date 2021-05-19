@@ -28,22 +28,18 @@
         <TextField fx:id="username" GridPane.columnIndex="1" GridPane.rowIndex="2">
             <GridPane.margin>
                 <Insets bottom="5.0" top="5.0" />
-            </GridPane.margin></TextField>
+            </GridPane.margin>
+        </TextField>
         <TextField fx:id="personal" GridPane.columnIndex="1" GridPane.rowIndex="3">
             <GridPane.margin>
-                <Insets bottom="10.0" top="10.0" />
+                <Insets bottom="5.0" top="5.0" />
             </GridPane.margin>
-            <padding>
-                <Insets bottom="5.0" top="5.0" />
-            </padding></TextField>
-        <TextField fx:id="password" accessibleRole="PASSWORD_FIELD" GridPane.columnIndex="1" GridPane.rowIndex="4">
-            <GridPane.margin>
-                <Insets bottom="5.0" top="5.0" />
-            </GridPane.margin></TextField>
+        </TextField>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Вход YandexMail" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <font>
                 <Font name="System Bold" size="14.0" />
             </font></Text>
         <Button mnemonicParsing="false" onAction="#signIn" text="Войти" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+        <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="4" />
     </children>
 </GridPane>
