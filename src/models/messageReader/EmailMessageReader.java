@@ -1,4 +1,4 @@
-package models;
+package models.messageReader;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -55,7 +55,7 @@ public class EmailMessageReader {
         return file;
     }
 
-    static String getFromEmailAddress(Message message) {
+    public static String getFromEmailAddress(Message message) {
         String email = null;
         try {
             Address[] addresses = message.getFrom();
@@ -66,7 +66,7 @@ public class EmailMessageReader {
         return email;
     }
 
-    static String getFromPersonal(Message message) {
+    public static String getFromPersonal(Message message) {
         String personal = null;
         try {
             Address[] addresses = message.getFrom();
@@ -77,7 +77,7 @@ public class EmailMessageReader {
         return personal;
     }
 
-    static String getSubject(Message message) {
+    public static String getSubject(Message message) {
         String subject = null;
         try {
             subject = message.getSubject();
@@ -117,7 +117,7 @@ public class EmailMessageReader {
         return files;
     }
 
-    static Date getDate(Message message) {
+    public static Date getDate(Message message) {
         Date date = null;
         try {
             date = message.getSentDate();

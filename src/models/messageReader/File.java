@@ -1,4 +1,4 @@
-package models;
+package models.messageReader;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
@@ -8,11 +8,11 @@ public class File {
 
     private final MimeBodyPart mimeBodyPart;
 
-    File(MimeBodyPart mimeBodyPart) {
+    public File(MimeBodyPart mimeBodyPart) {
         this.mimeBodyPart = mimeBodyPart;
     }
 
-    String getFileName() {
+    public String getFileName() {
         String file = null;
         try {
             file = mimeBodyPart.getFileName();
@@ -22,7 +22,7 @@ public class File {
         return  file;
     }
 
-    void saveFile(String folderPath) {
+    public void saveFile(String folderPath) {
         try {
             mimeBodyPart.saveFile(folderPath + java.io.File.separator + mimeBodyPart.getFileName());
         } catch (IOException | MessagingException e) {

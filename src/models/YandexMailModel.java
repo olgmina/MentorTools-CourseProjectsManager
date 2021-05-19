@@ -4,6 +4,7 @@ import entities.StageEntity;
 import entities.StatusEntity;
 import entities.StudentEntity;
 import entities.UserEntity;
+import models.messageReader.EmailMessageReader;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -49,11 +50,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
     }
 
     private Folder getInbox() throws MessagingException {
-        Properties props = getInboxProps();
-        Authenticator authenticator = getAuthenticator();
-        Session session = Session.getDefaultInstance(props, authenticator);
-        session.setDebug(false);
-        Store store = session.getStore();
+        Store store = createSession().getStore();
         store.connect(IMAP_host, yandexEmail, password);
         Folder inbox = store.getFolder("INBOX");
         inbox.open(Folder.READ_WRITE);
@@ -110,7 +107,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
         try {
             mp = (MimeMultipart) message.getContent();
             for (int i = 0; i < mp.getCount(); i++) {
-                models.File file = EmailMessageReader.getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
+                models.messageReader.File file = EmailMessageReader.getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
                 if (file != null) {
                     if (file.getFileName().contains(".pdf")
                             || file.getFileName().contains(".docx")
@@ -258,7 +255,6 @@ public class YandexMailModel extends BaseModel implements MailModel {
                 Date messageDate       = EmailMessageReader.getDate(message);
                 String PostScriptum = "\n\n" + AutoMessageModel.getInstance().getAutoMessage(AutoMessageModel.TEXT_ANSWERED_ON_DATE).getText().replaceAll("#ДАТА_СООБЩЕНИЯ#", messageDate.toString());
                 StageEntity firstStage = StageModel.getInstance().getFirstStage();
-                StageEntity lastStage = StageModel.getInstance().getLastStage();
                 StatusEntity firstStatus = StatusModel.getInstance().getFirstStatus();
                 StatusEntity lastStatus = StatusModel.getInstance().getLastStatus();
                 // Если корректный этап в письме

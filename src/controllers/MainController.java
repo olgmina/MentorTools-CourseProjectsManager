@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import models.*;
+import models.messageReader.EmailMessageReader;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
