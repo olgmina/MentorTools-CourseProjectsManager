@@ -1,15 +1,16 @@
 package controllers;
 
+import entities.AutoMessageEntity;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import entities.AutoMessageEntity;
-import javafx.stage.Stage;
 import models.AutoMessageModel;
 
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 
 public class AutoMessageController extends BaseController implements Initializable {

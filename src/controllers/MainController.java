@@ -207,7 +207,6 @@ public class MainController extends BaseController implements Initializable {
     public void showAllStudents() {
         students = StudentModel.getInstance().getStudents();
         if (students == null) {
-            studentsTable.getItems().clear();
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_STUDENTS);
         } else
             studentsTable.setItems(students);

@@ -1,6 +1,5 @@
 package models;
 
-import entities.StageEntity;
 import entities.StatusEntity;
 import javafx.collections.ObservableList;
 

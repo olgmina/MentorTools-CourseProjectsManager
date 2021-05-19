@@ -1,8 +1,5 @@
 package entities;
 
-import models.StageModel;
-import models.StatusModel;
-
 public class StudentEntity {
 
     private final int id;
