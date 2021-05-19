@@ -11,23 +11,21 @@
             <Menu mnemonicParsing="false" text="Опции">
                 <MenuItem mnemonicParsing="false" onAction="#close" text="Закрыть программу" />
                 <MenuItem mnemonicParsing="false" onAction="#changeDir" text="Изменить директорию для скачивания файлов" />
-            </Menu>
-            <Menu mnemonicParsing="false" text="Яндекс почта">
-                <MenuItem mnemonicParsing="false" onAction="#changeUser" text="Вход в почту" />
-                <MenuItem mnemonicParsing="false" onAction="#yandexQuit" text="Выйти из почты" />
-                <MenuItem mnemonicParsing="false" onAction="#inboxCount" text="Количество входящих сообщений" />
-                <MenuItem mnemonicParsing="false" onAction="#inboxNotSeenCount" text="Количество непрочитанных сообщений" />
-                <MenuItem mnemonicParsing="false" onAction="#showNotSeenMessages" text="Просмотреть непрочитанные сообщения" />
                 <MenuItem mnemonicParsing="false" onAction="#changeAutoMessages" text="Авто-сообщения" />
-                <MenuItem mnemonicParsing="false" onAction="#loadNotSeenMessages" text="Скачать новые сообщения" />
-                <MenuItem mnemonicParsing="false" onAction="#getDialogWithStudent" text="Просмотреть цепочку писем с выбранным студентом" />
-            </Menu>
-            <Menu mnemonicParsing="false" text="База данных">
                 <MenuItem mnemonicParsing="false" onAction="#showAllStudents" text="Просмотреть всех студентов" />
                 <MenuItem mnemonicParsing="false" onAction="#changeStatus" text="Изменить статус этапа для выбранного студента на следующий" />
                 <MenuItem mnemonicParsing="false" onAction="#changePersonal" text="Изменить персональные данные (ФИО) выбранного студента" />
                 <MenuItem mnemonicParsing="false" onAction="#openDir" text="Открыть папку выбранного студента" />
                 <MenuItem mnemonicParsing="false" onAction="#deleteStudent" text="Удалить выбранного студента" />
+            </Menu>
+            <Menu mnemonicParsing="false" text="Почта">
+                <MenuItem mnemonicParsing="false" onAction="#changeUser" text="Вход в почту" />
+                <MenuItem mnemonicParsing="false" onAction="#yandexQuit" text="Выйти из почты" />
+                <MenuItem mnemonicParsing="false" onAction="#inboxCount" text="Количество входящих сообщений" />
+                <MenuItem mnemonicParsing="false" onAction="#inboxNotSeenCount" text="Количество непрочитанных сообщений" />
+                <MenuItem mnemonicParsing="false" onAction="#showNotSeenMessages" text="Просмотреть непрочитанные сообщения" />
+                <MenuItem mnemonicParsing="false" onAction="#loadNotSeenMessages" text="Скачать новые сообщения" />
+                <MenuItem mnemonicParsing="false" onAction="#getDialogWithStudent" text="Просмотреть цепочку писем с выбранным студентом" />
             </Menu>
         </MenuBar>
     </top>
