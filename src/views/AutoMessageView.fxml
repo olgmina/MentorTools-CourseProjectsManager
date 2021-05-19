@@ -10,8 +10,8 @@
         <GridPane BorderPane.alignment="CENTER">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="320.0" minWidth="320.0" prefWidth="320.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="440.0" minWidth="440.0" prefWidth="440.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="589.0" minWidth="440.0" prefWidth="577.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
             </columnConstraints>
             <rowConstraints>

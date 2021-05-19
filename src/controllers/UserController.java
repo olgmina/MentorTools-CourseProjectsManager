@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import entities.UserEntity;
+import javafx.stage.Stage;
 import models.UserModel;
 import models.YandexMailModel;
 
@@ -32,6 +33,7 @@ public class UserController extends BaseController implements Initializable {
         UserModel.getInstance().insertUser(new UserEntity(0, username.getText() + mailDomain.getText().trim(), password.getText(), personal.getText()));
         try {
             yandexMailModel = YandexMailModel.getInstance();
+            getStage().close();
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_LOGIN);
         } catch (MessagingException e) {
             yandexMailModel = null;

@@ -42,6 +42,8 @@ public abstract class BaseController {
     public final String CONFIRMATION_CHANGE_STATUS               = "Вы действительно хотите изменить статус выбранного студента c '#ТЕКУЩИЙ_СТАТУС#' на '#СЛЕДУЮЩИЙ_СТАТУС#'?";
     public final String CONFIRMATION_STUDENT_PERSONAL_CHANGE     = "Вы действительно хотите изменить персональные данные студента?";
 
+    private static Stage stage = new Stage();
+
     public Optional<ButtonType> newAlert(Alert.AlertType alertType, String title, String contentText) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -52,14 +54,16 @@ public abstract class BaseController {
 
     public Stage getScene(String resourceFXML, String sceneTitle) {
         try {
-            Stage primaryStage = new Stage();
             Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourceFXML)));
-            primaryStage.setTitle(sceneTitle);
-            primaryStage.setScene(new Scene(root));
-            return primaryStage;
+            stage.setTitle(sceneTitle);
+            stage.setScene(new Scene(root));
         } catch (IOException exception) {
             newAlert(Alert.AlertType.ERROR, ERROR, ERROR_SOMETHING_GOING_WRONG);
-            return null;
         }
+        return stage;
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

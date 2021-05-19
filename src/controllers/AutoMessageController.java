@@ -5,6 +5,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import entities.AutoMessageEntity;
+import javafx.stage.Stage;
 import models.AutoMessageModel;
 
 import java.net.URL;
@@ -33,6 +34,7 @@ public class AutoMessageController extends BaseController implements Initializab
         textAreaStringMap.put(AutoMessageModel.TEXT_NOT_NEXT_STAGE, TEXT_NOT_NEXT_STAGE);
         textAreaStringMap.put(AutoMessageModel.TEXT_COURSE_PROJECT_COMPLETED, TEXT_COURSE_PROJECT_COMPLETED);
         textAreaStringMap.put(AutoMessageModel.TEXT_STATUS_CHANGED, TEXT_STATUS_CHANGED);
+        textAreaStringMap.put(AutoMessageModel.TEXT_ANSWERED_ON_DATE, TEXT_ANSWERED_ON_DATE);
         textAreaStringMap.forEach(
                 (name, textArea) -> textArea.setText(AutoMessageModel.getInstance().getAutoMessage(name).getText())
         );
@@ -46,6 +48,7 @@ public class AutoMessageController extends BaseController implements Initializab
                     AutoMessageModel.getInstance().saveAutoMessage(autoMessage);
                 }
         );
+        getStage().close();
         newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_SAVE);
     }
 }

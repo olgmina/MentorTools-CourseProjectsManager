@@ -32,6 +32,7 @@ public class ChangeStudentPersonalController extends BaseController implements I
                 if (option.get() == ButtonType.OK) {
                     if (!studentPersonal.getText().isEmpty()) {
                         student.setPersonal(studentPersonal.getText());
+                        getStage().close();
                     } else {
                         newAlert(Alert.AlertType.ERROR, ERROR, ERROR_REQUIRED_FIELDS);
                     }

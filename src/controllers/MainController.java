@@ -336,7 +336,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void changeAutoMessages() {
-        Stage stage = getScene("../views/AutoMessagesView.fxml", "Авто-сообщения");
+        Stage stage = getScene("../views/AutoMessageView.fxml", "Авто-сообщения");
         if (stage != null) stage.showAndWait();
     }
 
