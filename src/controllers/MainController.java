@@ -58,6 +58,11 @@ public class MainController extends BaseController implements Initializable {
         }
     }
 
+    //TODO: change user personal
+    public void changeUserPersonal() {
+
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (!rootFolder.exists()) {
