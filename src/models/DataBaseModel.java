@@ -11,7 +11,8 @@ import java.sql.*;
 
 public class DataBaseModel {
 
-    private static final String CON_STR = "jdbc:sqlite::resource:resources/DataBase";
+    private final File rootFolder = new java.io.File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "data");
+    private static String CON_STR = "jdbc:sqlite:";
     private static DataBaseModel instance = null;
     private Connection connection;
 
@@ -22,12 +23,18 @@ public class DataBaseModel {
     }
 
     private DataBaseModel() {
+        if (!rootFolder.exists()) rootFolder.mkdirs();
+        File db = new java.io.File(rootFolder.getAbsolutePath() + File.separator + "Database.sqlite");
+        boolean migrationNeeded = false;
+        if (!db.exists()) migrationNeeded = true;
+        CON_STR += db.getAbsolutePath();
         try {
             DriverManager.registerDriver(new JDBC());
             this.connection = DriverManager.getConnection(CON_STR);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        if (migrationNeeded) migrate();
     }
 
     private ResultSet executeQuery(String sql) {
@@ -45,9 +52,33 @@ public class DataBaseModel {
         } catch (SQLException ignored) {}
     }
 
+    private void migrate() {
+        createTableUser();
+        createTableAutoMessage();
+        createTableStage();
+        createTableStatus();
+        createTableStudent();
+    }
+
+
+
     /*---------------------------------------------------------
     --------------Students-------------------------------------
     ---------------------------------------------------------*/
+
+    private void createTableStudent() {
+        executeUpdate(
+                "create table Student(" +
+                        "id integer not null constraint Student_pk primary key autoincrement," +
+                        "personal text not null," +
+                        "emailAddress text not null," +
+                        "folderPath text not null," +
+                        "id_stage integer not null references Stage," +
+                        "id_status integer not null references Status," +
+                        "fileCount integer default 0 not null" +
+                        ");"
+        );
+    }
 
     public StudentEntity getStudent(String emailAddress) {
         return getStudentFromResultSet(
@@ -160,6 +191,16 @@ public class DataBaseModel {
     /*---------------------------------------------------------
     --------------Stage----------------------------------------
     ---------------------------------------------------------*/
+
+    private void createTableStage() {
+        executeUpdate(
+                "create table Stage(" +
+                        "id integer not null constraint Stage_pk primary key autoincrement,\n" +
+                        "name text not null" +
+                        ");" +
+                        "create unique index Stage_name_uindex on Stage (name);"
+        );
+    }
 
     public StageEntity getStage(int id) {
         return getStageFromResultSet(
@@ -287,6 +328,16 @@ public class DataBaseModel {
     --------------Status---------------------------------------
     ---------------------------------------------------------*/
 
+    private void createTableStatus() {
+        executeUpdate(
+                "create table Status(" +
+                        "id integer not null constraint Status_pk primary key autoincrement, " +
+                        "name text not null" +
+                        ");" +
+                        "create unique index Status_name_uindex on Status (name);"
+        );
+    }
+
     public StatusEntity getStatus(int id) {
         return getStatusFromResultSet(
                 executeQuery(
@@ -398,6 +449,19 @@ public class DataBaseModel {
     --------------User-----------------------------------------
     ---------------------------------------------------------*/
 
+    private void createTableUser() {
+        executeUpdate(
+                "create table User(" +
+                        "id integer not null constraint signIn_pk primary key autoincrement, " +
+                        "username text not null, " +
+                        "password text not null, " +
+                        "personal text " +
+                        ");" +
+                        "create unique index signIn_password_uindex on User (password);" +
+                        "create unique index signIn_username_uindex on User (username);"
+        );
+    }
+
     public UserEntity getUser() {
         return getUserFromResultSet(
                 executeQuery(
@@ -453,6 +517,27 @@ public class DataBaseModel {
     /*---------------------------------------------------------
     --------------Auto_Messages--------------------------------
     ---------------------------------------------------------*/
+
+    private void createTableAutoMessage() {
+        executeUpdate(
+                "create table Auto_message(" +
+                        "id integer constraint Auto_messages_pk primary key autoincrement, " +
+                        "message_name text, " +
+                        "message_text text" +
+                        ");" +
+                        "create unique index Auto_messages_message_name_uindex on Auto_message (message_name);" +
+                        "insert into Auto_message (message_name, message_text) " +
+                        "VALUES" +
+                        "('THEME', '#ТЕКУЩИЙ_ЭТАП#'), " +
+                        "('TEXT_STAGE_IS_ALREADY_COMPLETED', 'Вы уже завершили этап \"#УКАЗАННЫЙ_ЭТАП#\". Можете переходить к этапу \"#СЛЕДУЮЩИЙ_ЭТАП#\".'), " +
+                        "('TEXT_YOU_HAVE_NOT_DONE_STAGE', 'Вы не завершили этап \"#ТЕКУЩИЙ_ЭТАП#\".'), " +
+                        "('TEXT_WRONG_FORMAT', 'Файл, который был прикреплен к сообщению имеет недопустимый формат. Допускаются форматы \".pdf, .docx, .doc, .txt, .c\".'), " +
+                        "('TEXT_ANSWERED_ON_DATE', 'Отвечено на сообщение, отправленное: #ДАТА_СООБЩЕНИЯ#'), " +
+                        "('TEXT_NOT_NEXT_STAGE', 'Вы пропустили один из этапов. Переходите к этапу \"#СЛЕДУЮЩИЙ_ЭТАП#\".'), " +
+                        "('TEXT_COURSE_PROJECT_COMPLETED', 'Вы уже завершили курсовой проект.'), " +
+                        "('TEXT_STATUS_CHANGED', 'Статус этапа \"#ТЕКУЩИЙ_ЭТАП#\" изменен с \"#ТЕКУЩИЙ_СТАТУС#\" на \"#СЛЕДУЮЩИЙ_СТАТУС#\".');"
+        );
+    }
 
     public AutoMessageEntity getAutoMessage(String name) {
         return getAutoMessageFromResultSet(
