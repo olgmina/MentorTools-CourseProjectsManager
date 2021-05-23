@@ -39,12 +39,12 @@ public class YandexMailModel extends BaseModel implements MailModel {
         UserEntity user = dataBaseModel.getUser();
         if (user != null) {
             this.yandexEmail = user.getUsername();
-            this.password  = user.getPassword();
-            this.personal  = user.getPersonal();
+            this.password = user.getPassword();
+            this.personal = user.getPersonal();
         } else {
             this.yandexEmail = "example@yandex.ru";
-            this.password   = "password";
-            this.personal   = "personal";
+            this.password = "password";
+            this.personal = "personal";
         }
         getInbox();
     }
