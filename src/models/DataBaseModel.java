@@ -11,8 +11,6 @@ import java.sql.*;
 
 public class DataBaseModel {
 
-    private final File rootFolder = new java.io.File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "data");
-    private static String CON_STR = "jdbc:sqlite:";
     private static DataBaseModel instance = null;
     private Connection connection;
 
@@ -23,11 +21,13 @@ public class DataBaseModel {
     }
 
     private DataBaseModel() {
+        File rootFolder = new File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "data");
         if (!rootFolder.exists()) rootFolder.mkdirs();
+
         File db = new java.io.File(rootFolder.getAbsolutePath() + File.separator + "Database.sqlite");
-        boolean migrationNeeded = false;
-        if (!db.exists()) migrationNeeded = true;
-        CON_STR += db.getAbsolutePath();
+        boolean migrationNeeded = !db.exists();
+
+        String CON_STR = "jdbc:sqlite:" + db.getAbsolutePath();
         try {
             DriverManager.registerDriver(new JDBC());
             this.connection = DriverManager.getConnection(CON_STR);
@@ -59,8 +59,6 @@ public class DataBaseModel {
         createTableStatus();
         createTableStudent();
     }
-
-
 
     /*---------------------------------------------------------
     --------------Students-------------------------------------
