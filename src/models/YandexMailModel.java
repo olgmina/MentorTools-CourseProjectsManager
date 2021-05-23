@@ -150,7 +150,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
             address.setPersonal(personal);
             message.setFrom(address);
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(yandexEmail)); //ЭТО ВАЖНО, ТАК КАК ЯНДЕКС ОТПРАВЛЯЕТ СООБЩЕНИЯ ПО SMTP, А ДАННЫЙ ПРОТОКОЛ НЕ ОСТАВЛЯЕТ ПОСЛЕ СЕБЯ КОПИИ СООБЩЕНИЙ. НЕ ДОБАВЛЯЕТ ИХ В ОТПРАВЛЕННЫЕ
+            message.addRecipient(Message.RecipientType.TO, address); //ЭТО ВАЖНО, ТАК КАК ЯНДЕКС ОТПРАВЛЯЕТ СООБЩЕНИЯ ПО SMTP, А ДАННЫЙ ПРОТОКОЛ НЕ ОСТАВЛЯЕТ ПОСЛЕ СЕБЯ КОПИИ СООБЩЕНИЙ. НЕ ДОБАВЛЯЕТ ИХ В ОТПРАВЛЕННЫЕ
             message.setSubject(subject);
 
             Multipart multipart = new MimeMultipart();
@@ -173,7 +173,6 @@ public class YandexMailModel extends BaseModel implements MailModel {
         try {
             Folder inbox = getInbox();
             messages.addAll(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
-            inbox.close();
         } catch (MessagingException ignored) { }
         return messages;
     }
@@ -183,17 +182,22 @@ public class YandexMailModel extends BaseModel implements MailModel {
         ArrayList<Message> messages = new ArrayList<>();
         try {
             Folder inbox = getInbox();
-            messages.addAll(Arrays.asList(inbox.getMessages()));
-            inbox.close();
+            messages = new ArrayList<>(Arrays.asList(inbox.getMessages()));
         } catch (MessagingException ignored) { }
         return messages;
     }
 
     @Override
     public ArrayList<Message> getInboxDialogMessages(String emailTo, String theme) {
-        ArrayList<Message> allMessages = getInboxMessages();
+        ArrayList<Message> allMessages = new ArrayList<>();
         ArrayList<Message> dialogMessages = new ArrayList<>();
-        allMessages.forEach(message -> {
+        try {
+            Folder inbox = getInbox();
+            allMessages = new ArrayList<>(Arrays.asList(inbox.getMessages()));
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        for (Message message : allMessages) {
             String messageTheme = EmailMessageReader.getSubject(message);
             Address[] addresses = null;
             try {
@@ -220,7 +224,7 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     }
                 }
             }
-        });
+        }
         return dialogMessages;
     }
 
@@ -394,7 +398,6 @@ public class YandexMailModel extends BaseModel implements MailModel {
                     }
                 }
             }
-            inbox.close();
             messagesSetSeen();
         } catch (MessagingException ignored) {
         }
@@ -421,7 +424,6 @@ public class YandexMailModel extends BaseModel implements MailModel {
             Folder inbox = getInbox();
             ArrayList<Message> messages = new ArrayList<>(Arrays.asList(inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))));
             for (Message message : messages) message.setFlag(Flags.Flag.SEEN, true);
-            inbox.close();
         } catch (MessagingException ignored) { }
     }
 }
