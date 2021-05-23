@@ -196,7 +196,12 @@ public class DataBaseModel {
                         "id integer not null constraint Stage_pk primary key autoincrement,\n" +
                         "name text not null" +
                         ");" +
-                        "create unique index Stage_name_uindex on Stage (name);"
+                        "create unique index Stage_name_uindex on Stage (name);" +
+                        "insert into Stage (name) " +
+                        "VALUES" +
+                        "('задание'), " +
+                        "('разработка программы'), " +
+                        "('оформление пояснительной записки');"
         );
     }
 
@@ -332,7 +337,13 @@ public class DataBaseModel {
                         "id integer not null constraint Status_pk primary key autoincrement, " +
                         "name text not null" +
                         ");" +
-                        "create unique index Status_name_uindex on Status (name);"
+                        "create unique index Status_name_uindex on Status (name);" +
+                        "insert into Status (name) " +
+                        "VALUES" +
+                        "('ожидание'), " +
+                        "('рецензирование'), " +
+                        "('на исправлении'), " +
+                        "('завершено');"
         );
     }
 
