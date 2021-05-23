@@ -88,7 +88,7 @@ public class MainController extends BaseController implements Initializable {
 
     private void chooseStageForDialog(StudentEntity student) {
         if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
-            Stage stage = getScene("../views/ChooseStageView.fxml", "Выбор этапа для просмотра сообщений с выбранным студентом");
+            Stage stage = getScene("views/ChooseStageView.fxml", "Выбор этапа для просмотра сообщений с выбранным студентом");
             if (stage != null) stage.showAndWait();
             StringBuilder dialog = new StringBuilder();
             ArrayList<Message> dialogMessages = UserController.yandexMailModel.getInboxDialogMessages(student.getEmailAddress(), ChooseStageController.stage.getName());
@@ -323,7 +323,7 @@ public class MainController extends BaseController implements Initializable {
         StudentEntity student = studentsTable.getSelectionModel().getSelectedItem();
         if (student != null) {
             ChangeStudentPersonalController.student = student;
-            Stage stage = getScene("../views/ChangeStudentPersonalView.fxml", "Изменение персональных данных студента");
+            Stage stage = getScene("views/ChangeStudentPersonalView.fxml", "Изменение персональных данных студента");
             if (stage != null) stage.showAndWait();
             showAllStudents();
         } else {
@@ -344,7 +344,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     public void changeAutoMessages() {
-        Stage stage = getScene("../views/AutoMessageView.fxml", "Авто-сообщения");
+        Stage stage = getScene("views/AutoMessageView.fxml", "Авто-сообщения");
         if (stage != null) stage.showAndWait();
     }
 
@@ -358,7 +358,7 @@ public class MainController extends BaseController implements Initializable {
                 return;
             }
         }
-        Stage stage = getScene("../views/UserView.fxml", "Войдите в аккаунт");
+        Stage stage = getScene("views/UserView.fxml", "Войдите в аккаунт");
         if (stage != null) stage.showAndWait();
     }
 }

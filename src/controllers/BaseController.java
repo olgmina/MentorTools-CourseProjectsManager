@@ -52,9 +52,10 @@ public abstract class BaseController {
         return alert.showAndWait();
     }
 
+
     public Stage getScene(String resourceFXML, String sceneTitle) {
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(resourceFXML)));
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource(resourceFXML));
             stage.setTitle(sceneTitle);
             stage.setScene(new Scene(root));
         } catch (IOException exception) {
