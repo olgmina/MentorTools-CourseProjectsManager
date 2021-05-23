@@ -28,16 +28,20 @@ public class UserController extends BaseController implements Initializable {
     }
 
     public void signIn() {
-        UserModel.getInstance().clearUser();
-        UserModel.getInstance().insertUser(new UserEntity(0, username.getText() + mailDomain.getText().trim(), password.getText(), personal.getText()));
-        try {
-            yandexMailModel = YandexMailModel.getInstance();
-            getStage().close();
-            newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_LOGIN);
-        } catch (MessagingException e) {
-            yandexMailModel = null;
+        if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
             UserModel.getInstance().clearUser();
-            newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            UserModel.getInstance().insertUser(new UserEntity(0, username.getText() + mailDomain.getText().trim(), password.getText(), personal.getText()));
+            try {
+                yandexMailModel = YandexMailModel.getInstance();
+                getStage().close();
+                newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_LOGIN);
+            } catch (MessagingException e) {
+                yandexMailModel = null;
+                UserModel.getInstance().clearUser();
+                newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);
+            }
+        } else {
+            newAlert(Alert.AlertType.ERROR, ERROR, ERROR_REQUIRED_FIELDS);
         }
     }
 
