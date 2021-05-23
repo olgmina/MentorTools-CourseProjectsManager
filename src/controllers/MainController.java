@@ -105,7 +105,7 @@ public class MainController extends BaseController implements Initializable {
         }
     }
 
-    private boolean deleteDirectory(File path) {
+    private void deleteDirectory(File path) {
         if (path.exists()) {
             File[] files = path.listFiles();
             if (files != null)
@@ -116,7 +116,7 @@ public class MainController extends BaseController implements Initializable {
                         file.delete();
                 }
         }
-        return (path.delete());
+        path.delete();
     }
 
     public void close() {
