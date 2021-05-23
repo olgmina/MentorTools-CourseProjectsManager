@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import models.*;
 import models.messageReader.EmailMessageReader;
 
+import javax.mail.Flags;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.swing.*;
@@ -151,6 +152,11 @@ public class MainController extends BaseController implements Initializable {
                 for (Message value : messages) {
                     textArea.setText(textArea.getText() + EmailMessageReader.getAllMessage(value));
                     textArea.setText(textArea.getText() + "\n");
+                    try {
+                        value.setFlag(Flags.Flag.SEEN, false);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
                 }
             } else
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_UNREAD_MESSAGES);
@@ -164,6 +170,7 @@ public class MainController extends BaseController implements Initializable {
         if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             if (UserController.yandexMailModel.notSeenMessagesCount() > 0) {
                 UserController.yandexMailModel.loadNotSeenInboxMessage(rootFolder);
+                showAllStudents();
             } else
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_UNREAD_MESSAGES);
         } else {
@@ -318,6 +325,7 @@ public class MainController extends BaseController implements Initializable {
             ChangeStudentPersonalController.student = student;
             Stage stage = getScene("../views/ChangeStudentPersonalView.fxml", "Изменение персональных данных студента");
             if (stage != null) stage.showAndWait();
+            showAllStudents();
         } else {
             newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_CHOOSE_STUDENT);
         }
