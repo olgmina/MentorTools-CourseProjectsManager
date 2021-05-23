@@ -6,11 +6,12 @@ import javafx.collections.ObservableList;
 import org.sqlite.JDBC;
 
 import java.io.File;
+import java.net.URL;
 import java.sql.*;
 
 public class DataBaseModel {
 
-    private static final String CON_STR = "jdbc:sqlite:" + System.getProperty("user.dir") + File.separator + "src" + File.separator + "resources" + File.separator + "DataBase";
+    private static final String CON_STR = "jdbc:sqlite::resource:resources/DataBase";
     private static DataBaseModel instance = null;
     private Connection connection;
 
@@ -270,7 +271,12 @@ public class DataBaseModel {
         ObservableList<StageEntity> stages = FXCollections.observableArrayList();
         if (resultSet != null) {
             try {
-                while (resultSet.next()) stages.add(getStageFromResultSet(resultSet));
+                while (resultSet.next()) stages.add(
+                        new StageEntity(
+                                resultSet.getInt("id"),
+                                resultSet.getString("name")
+                        )
+                );
                 if (!stages.isEmpty()) return stages;
             } catch (SQLException ignored) {}
         }
@@ -296,7 +302,7 @@ public class DataBaseModel {
                 executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
-                                "WHERE id > " + currentStatus.getId() + "" +
+                                "WHERE id > " + currentStatus.getId() + " " +
                                 "ORDER BY id " +
                                 "LIMIT 1"
                 )
@@ -360,11 +366,12 @@ public class DataBaseModel {
     private StatusEntity getStatusFromResultSet(ResultSet resultSet) {
         if (resultSet != null) {
             try {
-                if (resultSet.next())
+                if (resultSet.next()) {
                     return new StatusEntity(
                             resultSet.getInt("id"),
                             resultSet.getString("name")
                     );
+                }
             } catch (SQLException ignored) {
             }
         }
@@ -375,7 +382,12 @@ public class DataBaseModel {
         ObservableList<StatusEntity> statuses = FXCollections.observableArrayList();
         if (resultSet != null) {
             try {
-                while (resultSet.next()) statuses.add(getStatusFromResultSet(resultSet));
+                while (resultSet.next()) statuses.add(
+                        new StatusEntity(
+                                resultSet.getInt("id"),
+                                resultSet.getString("name")
+                        )
+                );
                 if (!statuses.isEmpty()) return statuses;
             } catch (SQLException ignored) {}
         }
