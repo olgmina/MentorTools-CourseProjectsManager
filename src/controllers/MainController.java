@@ -43,7 +43,7 @@ public class MainController extends BaseController implements Initializable {
     public TextArea message;
 
     private ObservableList<StudentEntity> students = null;
-    private File rootFolder = new java.io.File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "students");
+    private File studentsFolder = new java.io.File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "students");
 
     public MainController() {
         if (!UserModel.getInstance().isLogged()) {
@@ -65,8 +65,8 @@ public class MainController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (!rootFolder.exists()) {
-            rootFolder.mkdirs();
+        if (!studentsFolder.exists()) {
+            studentsFolder.mkdirs();
         }
 
         studentsTable.setOnMouseClicked(e -> {
@@ -174,7 +174,7 @@ public class MainController extends BaseController implements Initializable {
     public void loadNotSeenMessages() {
         if (UserController.yandexMailModel != null && UserModel.getInstance().isLogged()) {
             if (UserController.yandexMailModel.notSeenMessagesCount() > 0) {
-                UserController.yandexMailModel.loadNotSeenInboxMessage(rootFolder);
+                UserController.yandexMailModel.loadNotSeenInboxMessage(studentsFolder);
                 showAllStudents();
             } else
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_NO_UNREAD_MESSAGES);
@@ -261,15 +261,15 @@ public class MainController extends BaseController implements Initializable {
         if (option.isPresent())
             if (option.get() == ButtonType.OK) {
                 JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setSelectedFile(rootFolder);
+                fileChooser.setSelectedFile(studentsFolder);
                 fileChooser.setDialogTitle("Выберите папку");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileChooser.setAcceptAllFileFilterUsed(false);
 
                 if (fileChooser.showOpenDialog(new JButton()) == JFileChooser.APPROVE_OPTION) {
-                    rootFolder = fileChooser.getSelectedFile();
-                    if (rootFolder != null) {
-                        StudentModel.getInstance().changeDir(rootFolder);
+                    studentsFolder = fileChooser.getSelectedFile();
+                    if (studentsFolder != null) {
+                        StudentModel.getInstance().changeDir(studentsFolder);
                         showAllStudents();
                     }
                 }
