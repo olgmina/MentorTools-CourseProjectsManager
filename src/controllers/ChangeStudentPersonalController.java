@@ -5,6 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
+import models.StudentModel;
 
 import java.net.URL;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class ChangeStudentPersonalController extends BaseController implements I
                 if (option.get() == ButtonType.OK) {
                     if (!studentPersonal.getText().isEmpty()) {
                         student.setPersonal(studentPersonal.getText());
+                        StudentModel.getInstance().updateStudent(student);
                         getStage().close();
                     } else {
                         newAlert(Alert.AlertType.ERROR, ERROR, ERROR_REQUIRED_FIELDS);
