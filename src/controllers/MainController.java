@@ -40,7 +40,7 @@ public class MainController extends BaseController implements Initializable {
     public TextArea message;
 
     private ObservableList<StudentEntity> students = null;
-    private File rootFolder;
+    private File rootFolder = new java.io.File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "students");
 
     public MainController() {
         if (!UserModel.getInstance().isLogged()) {
@@ -57,12 +57,9 @@ public class MainController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        rootFolder = new java.io.File(
-                System.getProperty("user.dir") + File.separator +
-                        "src" + File.separator +
-                        "resources" + File.separator +
-                        "students"
-        );
+        if (!rootFolder.exists()) {
+            rootFolder.mkdirs();
+        }
 
         studentsTable.setOnMouseClicked(e -> {
             try {
