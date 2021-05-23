@@ -31,8 +31,7 @@
 ![Клонирование репозитория](src/resources/images/screen_clone_repository.png)
 
 4) В IDE IntelliJ IDEA перейти в `FILE > OPEN...`, выбрать путь, куда был распакован 
-   проект, нажать на папку с проектом (CourseProjectsManager-development-main), 
-   затем на кнопку `OK`
+   или клонирован проект, нажать на папку с проектом, затем на кнопку `OK`
 
 ![Запуск IDE](src/resources/images/screen_open.jpg)
 
