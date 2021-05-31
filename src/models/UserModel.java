@@ -2,6 +2,9 @@ package models;
 
 import entities.UserEntity;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class UserModel extends BaseModel {
 
     private static UserModel instance = null;
@@ -13,23 +16,55 @@ public class UserModel extends BaseModel {
     }
 
     public UserEntity getUser() {
-        return dataBaseModel.getUser();
+        return getUserFromResultSet(
+                dataBaseHandler.executeQuery(
+                        "SELECT id, username, password, personal " +
+                                "FROM User"
+                )
+        );
     }
 
     public void insertUser(UserEntity user) {
-        dataBaseModel.insertUser(user);
+        clearUser();
+        dataBaseHandler.executeUpdate(
+                "INSERT INTO User(username, password, personal) " +
+                        "VALUES('" + user.getUsername() + "','" + user.getPassword() + "','" + user.getPersonal() + "')"
+        );
     }
 
     public void updateUser(UserEntity user) {
-        dataBaseModel.updateUser(user);
+        dataBaseHandler.executeUpdate(
+                "UPDATE User " +
+                        "SET " +
+                        "personal = '" + user.getPersonal() + "' " +
+                        "WHERE id = " + user.getId()
+        );
     }
 
     public void clearUser() {
-        dataBaseModel.clearUser();
+        dataBaseHandler.executeUpdate(
+                "DELETE " +
+                        "FROM User"
+        );
     }
 
     public boolean isLogged() {
-        return dataBaseModel.isLogged();
+        return this.getUser() != null;
+    }
+
+    private UserEntity getUserFromResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                if (resultSet.next())
+                    return new UserEntity(resultSet.getInt("id"),
+                            resultSet.getString("username"),
+                            resultSet.getString("password"),
+                            resultSet.getString("personal")
+                    );
+            } catch (SQLException ignored) {
+            }
+        }
+        return null;
     }
 
 }

@@ -1,4 +1,4 @@
-package models.messageReader;
+package models.mail.messageReader;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
@@ -19,7 +19,7 @@ public class File {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-        return  file;
+        return file;
     }
 
     public void saveFile(String folderPath) {

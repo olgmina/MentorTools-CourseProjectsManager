@@ -1,4 +1,4 @@
-package models.messageReader;
+package models.mail.messageReader;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -17,21 +17,19 @@ public class EmailMessageReader {
         String text = null;
         if (bp.getFileName() == null && !(bp.getContent() instanceof MimeMultipart) && bp.isMimeType("text/plain")) {
             text = bp.getContent().toString().trim();
-        }
-        else if (bp.getContent() instanceof MimeMultipart) {
+        } else if (bp.getContent() instanceof MimeMultipart) {
             text = getTextFromMimeMultipart((MimeMultipart) bp.getContent());
         }
         return text;
     }
 
-    private static String getTextFromMimeMultipart (MimeMultipart mimeMultipart) throws MessagingException, IOException {
+    private static String getTextFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
         String text = null;
         for (int i = 0; i < mimeMultipart.getCount(); i++) {
             BodyPart bp = mimeMultipart.getBodyPart(i);
             if (bp.getFileName() == null && !(bp.getContent() instanceof MimeMultipart) && bp.isMimeType("text/plain")) {
                 text = bp.getContent().toString().trim();
-            }
-            else if (bp.getContent() instanceof MimeMultipart)
+            } else if (bp.getContent() instanceof MimeMultipart)
                 text = getTextFromMimeMultipart((MimeMultipart) bp.getContent());
         }
         return text;
@@ -41,13 +39,12 @@ public class EmailMessageReader {
         File file = null;
         if (bp.getFileName() != null) {
             file = new File(bp);
-        }
-        else if (bp.getContent() instanceof MimeMultipart)
+        } else if (bp.getContent() instanceof MimeMultipart)
             file = getFileFromMimeMultipart((MimeMultipart) bp.getContent());
         return file;
     }
 
-    private static File getFileFromMimeMultipart (MimeMultipart mimeMultipart) throws MessagingException, IOException {
+    private static File getFileFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
         File file = null;
         for (int i = 0; i < mimeMultipart.getCount(); i++) {
             file = getFileFromMimeBodyPart((MimeBodyPart) mimeMultipart.getBodyPart(i));
@@ -97,8 +94,8 @@ public class EmailMessageReader {
                 if (text != null)
                     break;
             }
+        } catch (ClassCastException | MessagingException | IOException ignored) {
         }
-        catch (ClassCastException | MessagingException | IOException ignored) { }
         return text;
     }
 
@@ -112,8 +109,8 @@ public class EmailMessageReader {
                 if (file != null)
                     files.add(file);
             }
+        } catch (ClassCastException | MessagingException | IOException ignored) {
         }
-        catch (ClassCastException | MessagingException | IOException ignored) { }
         return files;
     }
 

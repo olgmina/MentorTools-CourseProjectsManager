@@ -1,5 +1,8 @@
 package models;
 
+import models.database.DataBaseDao;
+import models.database.DataBaseHandler;
+
 public abstract class BaseModel {
-    protected static DataBaseModel dataBaseModel = DataBaseModel.getInstance();
+    protected static DataBaseDao dataBaseHandler = DataBaseHandler.getInstance();
 }

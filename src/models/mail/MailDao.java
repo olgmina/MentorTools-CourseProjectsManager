@@ -1,4 +1,4 @@
-package models;
+package models.mail;
 
 import entities.StatusEntity;
 import entities.StudentEntity;
@@ -8,7 +8,8 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.util.ArrayList;
 
-public interface MailModel {
+public interface MailDao {
+
     int notSeenMessagesCount();
 
     int inboxMessagesCount();
@@ -19,13 +20,14 @@ public interface MailModel {
 
     ArrayList<Message> getInboxMessages();
 
-    ArrayList<Message> getInboxDialogMessages(String emailTo, String theme);
+    ArrayList<Message> getDialogMessages(String emailTo, String theme);
 
-    void deleteInboxDialogMessages(String emailTo, String theme);
+    void deleteDialogMessages(String emailTo, String theme);
 
     void loadNotSeenInboxMessage(File rootFolder);
 
     void changeStatus(StudentEntity student, StatusEntity nextStatus);
 
     void messagesSetSeen();
+
 }

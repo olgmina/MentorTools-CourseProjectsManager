@@ -9,14 +9,15 @@
     <top>
         <MenuBar prefHeight="30.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Опции">
-                <MenuItem mnemonicParsing="false" onAction="#close" text="Закрыть программу" />
                 <MenuItem mnemonicParsing="false" onAction="#changeDir" text="Изменить директорию для скачивания файлов" />
                 <MenuItem mnemonicParsing="false" onAction="#changeAutoMessages" text="Авто-сообщения" />
                 <MenuItem mnemonicParsing="false" onAction="#showAllStudents" text="Просмотреть всех студентов" />
                 <MenuItem mnemonicParsing="false" onAction="#changeStatus" text="Изменить статус этапа для выбранного студента на следующий" />
+                <MenuItem mnemonicParsing="false" onAction="#changeStatusBack" text="Изменить статус этапа для выбранного студента на предыдущий" />
                 <MenuItem mnemonicParsing="false" onAction="#changePersonal" text="Изменить персональные данные (ФИО) выбранного студента" />
                 <MenuItem mnemonicParsing="false" onAction="#openDir" text="Открыть папку выбранного студента" />
                 <MenuItem mnemonicParsing="false" onAction="#deleteStudent" text="Удалить выбранного студента" />
+                <MenuItem mnemonicParsing="false" onAction="#close" text="Закрыть программу" />
             </Menu>
             <Menu mnemonicParsing="false" text="Почта">
                 <MenuItem mnemonicParsing="false" onAction="#changeUser" text="Вход в почту" />

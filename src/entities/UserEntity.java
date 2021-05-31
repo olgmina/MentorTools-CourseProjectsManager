@@ -8,7 +8,7 @@ public class UserEntity {
     private String personal;
 
     public UserEntity(int id, String username, String password, String personal) {
-        this.id       = id;
+        this.id = id;
         this.username = username;
         this.password = password;
         this.personal = personal;

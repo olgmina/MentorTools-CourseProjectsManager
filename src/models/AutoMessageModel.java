@@ -53,7 +53,8 @@ public class AutoMessageModel extends BaseModel{
                             resultSet.getString("message_name"),
                             resultSet.getString("message_text")
                     );
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
         }
         return null;
     }

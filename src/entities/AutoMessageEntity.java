@@ -7,9 +7,9 @@ public class AutoMessageEntity {
     private String text;
 
     public AutoMessageEntity(int id, String name, String text) {
-        this.id     = id;
-        this.name   = name;
-        this.text   = text;
+        this.id = id;
+        this.name = name;
+        this.text = text;
     }
 
     public int getId() {
