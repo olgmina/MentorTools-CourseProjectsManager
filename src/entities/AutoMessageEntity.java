@@ -2,9 +2,9 @@ package entities;
 
 public class AutoMessageEntity {
 
-    private final int    id;
+    private final int id;
     private final String name;
-    private String       text;
+    private String text;
 
     public AutoMessageEntity(int id, String name, String text) {
         this.id     = id;

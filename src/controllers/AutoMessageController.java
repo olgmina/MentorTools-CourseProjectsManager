@@ -46,10 +46,11 @@ public class AutoMessageController extends BaseController implements Initializab
                 (name, textArea) -> {
                     AutoMessageEntity autoMessage = AutoMessageModel.getInstance().getAutoMessage(name);
                     autoMessage.setText(textArea.getText());
-                    AutoMessageModel.getInstance().saveAutoMessage(autoMessage);
+                    AutoMessageModel.getInstance().updateAutoMessage(autoMessage);
                 }
         );
         getStage().close();
         newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_SAVE);
     }
+
 }
