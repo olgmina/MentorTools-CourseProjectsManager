@@ -31,6 +31,7 @@ public abstract class BaseController {
     public final String INFORMATION_STUDENT_IS_EMPTY             = "Вы не выбрали студента из таблицы";
     public final String INFORMATION_MESSAGE_SENT                 = "Сообщение успешно отправлено";
     public final String INFORMATION_NO_NEXT_STATUS               = "Это последний статус";
+    public final String INFORMATION_NO_PREVIOUS_STATUS           = "Это первый статус";
     // Подтверждения
     public final String CONFIRMATION                             = "Подтверждение";
     public final String CONFIRMATION_SURE_TO_QUIT_ACCOUNT        = "Вы уверены, что хотите выйти из почтового аккаунта?";
@@ -51,7 +52,6 @@ public abstract class BaseController {
         return alert.showAndWait();
     }
 
-
     public Stage getScene(String resourceFXML, String sceneTitle) {
         try {
             Parent root = FXMLLoader.load(getClass().getClassLoader().getResource(resourceFXML));
@@ -66,4 +66,5 @@ public abstract class BaseController {
     public Stage getStage() {
         return stage;
     }
+
 }
