@@ -22,4 +22,5 @@ public class ChooseStageController extends BaseController implements Initializab
         stage = stageList.getSelectionModel().getSelectedItem();
         getStage().close();
     }
+
 }

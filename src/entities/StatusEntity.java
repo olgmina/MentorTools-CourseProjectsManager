@@ -25,4 +25,5 @@ public class StatusEntity {
     public String toString() {
         return getName();
     }
+
 }

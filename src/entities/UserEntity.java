@@ -5,7 +5,7 @@ public class UserEntity {
     private final int id;
     private final String username;
     private final String password;
-    private String  personal;
+    private String personal;
 
     public UserEntity(int id, String username, String password, String personal) {
         this.id       = id;
