@@ -23,7 +23,7 @@ public class StudentModel extends BaseModel {
 
     public StudentEntity getStudent(String emailAddress) {
         return getStudentFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
                                 "FROM Student " +
                                 "WHERE emailAddress = '" + emailAddress + "'"
@@ -33,7 +33,7 @@ public class StudentModel extends BaseModel {
 
     public ObservableList<StudentEntity> getStudents() {
         return getStudentsFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
                                 "FROM Student"
                 )
@@ -41,7 +41,7 @@ public class StudentModel extends BaseModel {
     }
 
     public void addStudent(StudentEntity student) {
-        dataBaseHandler.executeUpdate(
+        super.dataBaseHandler.executeUpdate(
                 "INSERT INTO Student(" +
                         "personal, " +
                         "emailAddress, " +
@@ -60,14 +60,14 @@ public class StudentModel extends BaseModel {
     }
 
     public void deleteStudent(int id) {
-        dataBaseHandler.executeUpdate(
+        super.dataBaseHandler.executeUpdate(
                 "DELETE FROM Student " +
                         "WHERE id = " + id
         );
     }
 
     public void updateStudent(StudentEntity student) {
-        dataBaseHandler.executeUpdate(
+        super.dataBaseHandler.executeUpdate(
                 "UPDATE Student " +
                         "SET " +
                         "personal = '" + student.getPersonal() + "', " +
@@ -80,7 +80,7 @@ public class StudentModel extends BaseModel {
     }
 
     public void changeDir(File file) {
-        this.getStudents().forEach(student -> dataBaseHandler.executeUpdate(
+        getStudents().forEach(student -> super.dataBaseHandler.executeUpdate(
                 "UPDATE Student " +
                         "SET " +
                         "folderPath = '" + file.getPath() + "\\" + student.getEmailAddress() + "' " +

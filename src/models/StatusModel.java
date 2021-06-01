@@ -22,7 +22,7 @@ public class StatusModel extends BaseModel {
 
     public StatusEntity getStatus(int id) {
         return getStatusFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "WHERE id = " + id
@@ -32,7 +32,7 @@ public class StatusModel extends BaseModel {
 
     public StatusEntity getNextStatus(StatusEntity currentStatus) {
         return getStatusFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "WHERE id > " + currentStatus.getId() + " " +
@@ -44,7 +44,7 @@ public class StatusModel extends BaseModel {
 
     public StatusEntity getPreviousStatus(StatusEntity currentStatus) {
         return getStatusFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "WHERE id < " + currentStatus.getId() + " " +
@@ -56,7 +56,7 @@ public class StatusModel extends BaseModel {
 
     public StatusEntity getFirstStatus() {
         return getStatusFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "ORDER BY id " +
@@ -67,7 +67,7 @@ public class StatusModel extends BaseModel {
 
     public StatusEntity getLastStatus() {
         return getStatusFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Status " +
                                 "ORDER BY id DESC " +
@@ -78,7 +78,7 @@ public class StatusModel extends BaseModel {
 
     public ObservableList<StatusEntity> getStatuses() {
         return getStatusesFromResultSet(
-                dataBaseHandler.executeQuery(
+                super.dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Status"
                 )
@@ -86,21 +86,21 @@ public class StatusModel extends BaseModel {
     }
 
     public void addStatus(StatusEntity status) {
-        dataBaseHandler.executeUpdate(
+        super.dataBaseHandler.executeUpdate(
                 "INSERT INTO Status(name) " +
                         "VALUES('" + status.getName() + "')"
         );
     }
 
     public void deleteStatus(int id) {
-        dataBaseHandler.executeUpdate(
+        super.dataBaseHandler.executeUpdate(
                 "DELETE FROM Status " +
                         "WHERE id = " + id
         );
     }
 
     public void updateStatus(StatusEntity status) {
-        dataBaseHandler.executeUpdate(
+        super.dataBaseHandler.executeUpdate(
                 "UPDATE Status " +
                         "SET " +
                         "name = '" + status.getName() + "' " +
