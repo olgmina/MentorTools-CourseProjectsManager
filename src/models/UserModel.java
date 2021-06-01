@@ -15,9 +15,11 @@ public class UserModel extends BaseModel {
         return instance;
     }
 
+    private UserModel() { }
+
     public UserEntity getUser() {
         return getUserFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, username, password, personal " +
                                 "FROM User"
                 )
@@ -26,14 +28,14 @@ public class UserModel extends BaseModel {
 
     public void insertUser(UserEntity user) {
         clearUser();
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "INSERT INTO User(username, password, personal) " +
                         "VALUES('" + user.getUsername() + "','" + user.getPassword() + "','" + user.getPersonal() + "')"
         );
     }
 
     public void updateUser(UserEntity user) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "UPDATE User " +
                         "SET " +
                         "personal = '" + user.getPersonal() + "' " +
@@ -42,7 +44,7 @@ public class UserModel extends BaseModel {
     }
 
     public void clearUser() {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "DELETE " +
                         "FROM User"
         );

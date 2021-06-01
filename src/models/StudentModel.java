@@ -18,12 +18,11 @@ public class StudentModel extends BaseModel {
         return instance;
     }
 
-    private StudentModel() {
-    }
+    private StudentModel() { }
 
     public StudentEntity getStudent(String emailAddress) {
         return getStudentFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
                                 "FROM Student " +
                                 "WHERE emailAddress = '" + emailAddress + "'"
@@ -33,7 +32,7 @@ public class StudentModel extends BaseModel {
 
     public ObservableList<StudentEntity> getStudents() {
         return getStudentsFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, personal, emailAddress, folderPath, id_stage, id_status, fileCount " +
                                 "FROM Student"
                 )
@@ -41,7 +40,7 @@ public class StudentModel extends BaseModel {
     }
 
     public void addStudent(StudentEntity student) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "INSERT INTO Student(" +
                         "personal, " +
                         "emailAddress, " +
@@ -60,14 +59,14 @@ public class StudentModel extends BaseModel {
     }
 
     public void deleteStudent(int id) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "DELETE FROM Student " +
                         "WHERE id = " + id
         );
     }
 
     public void updateStudent(StudentEntity student) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "UPDATE Student " +
                         "SET " +
                         "personal = '" + student.getPersonal() + "', " +
@@ -80,7 +79,7 @@ public class StudentModel extends BaseModel {
     }
 
     public void changeDir(File file) {
-        getStudents().forEach(student -> super.dataBaseHandler.executeUpdate(
+        getStudents().forEach(student -> dataBaseHandler.executeUpdate(
                 "UPDATE Student " +
                         "SET " +
                         "folderPath = '" + file.getPath() + "\\" + student.getEmailAddress() + "' " +

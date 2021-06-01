@@ -17,12 +17,11 @@ public class StageModel extends BaseModel {
         return instance;
     }
 
-    private StageModel() {
-    }
+    private StageModel() { }
 
     public StageEntity getStage(int id) {
         return getStageFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage " +
                                 "WHERE id = " + id + ""
@@ -32,7 +31,7 @@ public class StageModel extends BaseModel {
 
     public StageEntity getStage(String name) {
         return getStageFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage " +
                                 "WHERE name = '" + name + "'"
@@ -42,7 +41,7 @@ public class StageModel extends BaseModel {
 
     public StageEntity getNextStage(StageEntity currentStage) {
         return getStageFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage " +
                                 "WHERE id > " + currentStage.getId() + " " +
@@ -54,7 +53,7 @@ public class StageModel extends BaseModel {
 
     public StageEntity getFirstStage() {
         return getStageFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage " +
                                 "ORDER BY id " +
@@ -65,7 +64,7 @@ public class StageModel extends BaseModel {
 
     public StageEntity getLastStage() {
         return getStageFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage " +
                                 "ORDER BY id DESC " +
@@ -76,7 +75,7 @@ public class StageModel extends BaseModel {
 
     public ObservableList<StageEntity> getStages() {
         return getStagesFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, name " +
                                 "FROM Stage"
                 )
@@ -84,21 +83,21 @@ public class StageModel extends BaseModel {
     }
 
     public void addStage(StageEntity stage) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "INSERT INTO Stage(name) " +
                         "VALUES('" + stage.getName() + "')"
         );
     }
 
     public void deleteStage(int id) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "DELETE FROM Stage " +
                         "WHERE id = " + id
         );
     }
 
     public void updateStage(StageEntity stage) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "UPDATE Stage " +
                         "SET " +
                         "name = '" + stage.getName() + "' " +

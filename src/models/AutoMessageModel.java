@@ -27,7 +27,7 @@ public class AutoMessageModel extends BaseModel{
 
     public AutoMessageEntity getAutoMessage(String name) {
         return getAutoMessageFromResultSet(
-                super.dataBaseHandler.executeQuery(
+                dataBaseHandler.executeQuery(
                         "SELECT id, message_name, message_text " +
                                 "FROM Auto_message " +
                                 "WHERE message_name = '" + name + "'"
@@ -36,7 +36,7 @@ public class AutoMessageModel extends BaseModel{
     }
 
     public void updateAutoMessage(AutoMessageEntity autoMessage) {
-        super.dataBaseHandler.executeUpdate(
+        dataBaseHandler.executeUpdate(
                 "UPDATE Auto_message " +
                         "SET " +
                         "message_text = '" + autoMessage.getText() + "' " +
