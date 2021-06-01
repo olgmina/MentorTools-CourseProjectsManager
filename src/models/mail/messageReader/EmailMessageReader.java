@@ -35,17 +35,17 @@ public class EmailMessageReader {
         return text;
     }
 
-    public static File getFileFromMimeBodyPart(MimeBodyPart bp) throws MessagingException, IOException {
-        File file = null;
+    public static EmailFile getFileFromMimeBodyPart(MimeBodyPart bp) throws MessagingException, IOException {
+        EmailFile file = null;
         if (bp.getFileName() != null) {
-            file = new File(bp);
+            file = new EmailFile(bp);
         } else if (bp.getContent() instanceof MimeMultipart)
             file = getFileFromMimeMultipart((MimeMultipart) bp.getContent());
         return file;
     }
 
-    private static File getFileFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
-        File file = null;
+    private static EmailFile getFileFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
+        EmailFile file = null;
         for (int i = 0; i < mimeMultipart.getCount(); i++) {
             file = getFileFromMimeBodyPart((MimeBodyPart) mimeMultipart.getBodyPart(i));
         }
@@ -99,13 +99,13 @@ public class EmailMessageReader {
         return text;
     }
 
-    private static ArrayList<File> getFiles(Message message) {
-        ArrayList<File> files = new ArrayList<>();
+    private static ArrayList<EmailFile> getFiles(Message message) {
+        ArrayList<EmailFile> files = new ArrayList<>();
         MimeMultipart mp;
         try {
             mp = (MimeMultipart) message.getContent();
             for (int i = 0; i < mp.getCount(); i++) {
-                File file = getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
+                EmailFile file = getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
                 if (file != null)
                     files.add(file);
             }
@@ -131,8 +131,8 @@ public class EmailMessageReader {
         text.append("Дата: ").append(getDate(message)).append("\n");
         text.append("Тема: '").append(getSubject(message)).append("'\n");
         text.append("Сообщение: '").append(getText(message)).append("'\n");
-        ArrayList<File> files = getFiles(message);
-        for (File file : files) {
+        ArrayList<EmailFile> files = getFiles(message);
+        for (EmailFile file : files) {
             text.append("Файл: '").append(file.toString()).append("'\n");
         }
         text.append("------------------------------------------------------\n");
@@ -143,8 +143,8 @@ public class EmailMessageReader {
         StringBuilder text = new StringBuilder();
         if (!getText(message).isEmpty())
             text.append(String.format("[%s] (%s) %s\n", getFromPersonal(message), getSubject(message), getText(message)));
-        ArrayList<File> files = getFiles(message);
-        for (File file : files) {
+        ArrayList<EmailFile> files = getFiles(message);
+        for (EmailFile file : files) {
             text.append(String.format("[%s] (%s) %s (Вложение)\n", getFromPersonal(message), getSubject(message), file.getFileName()));
         }
         return text.toString();

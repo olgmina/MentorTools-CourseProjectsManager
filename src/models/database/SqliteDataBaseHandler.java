@@ -5,18 +5,18 @@ import org.sqlite.JDBC;
 import java.io.File;
 import java.sql.*;
 
-public class DataBaseHandler implements DataBaseDao {
+public class SqliteDataBaseHandler implements DataBaseDao {
 
     private static DataBaseDao instance = null;
     private Connection connection;
 
     public static DataBaseDao getInstance() {
         if (instance == null)
-            instance = new DataBaseHandler();
+            instance = new SqliteDataBaseHandler();
         return instance;
     }
 
-    private DataBaseHandler() {
+    private SqliteDataBaseHandler() {
         File rootFolder = new File(System.getenv("APPDATA") + File.separator + "CourseProjectsManager" + File.separator + "data");
         if (!rootFolder.exists()) rootFolder.mkdirs();
 

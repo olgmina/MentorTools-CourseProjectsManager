@@ -6,9 +6,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import models.mail.MailDao;
+import models.mail.EmailDao;
 import models.UserModel;
-import models.mail.YandexMailHandled;
+import models.mail.YandexEmailHandled;
 
 import javax.mail.MessagingException;
 import java.net.URL;
@@ -21,7 +21,7 @@ public class UserController extends BaseController implements Initializable {
     public PasswordField password;
     public Label mailDomain;
 
-    public static MailDao yandexMailHandled = null;
+    public static EmailDao yandexMailHandled = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -33,7 +33,7 @@ public class UserController extends BaseController implements Initializable {
             UserModel.getInstance().clearUser();
             UserModel.getInstance().insertUser(new UserEntity(0, username.getText() + mailDomain.getText().trim(), password.getText(), personal.getText()));
             try {
-                yandexMailHandled = YandexMailHandled.getInstance();
+                yandexMailHandled = YandexEmailHandled.getInstance();
                 getStage().close();
                 newAlert(Alert.AlertType.INFORMATION, INFORMATION, INFORMATION_SUCCESS_LOGIN);
             } catch (MessagingException e) {

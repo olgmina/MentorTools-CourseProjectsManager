@@ -5,6 +5,7 @@ import entities.StatusEntity;
 import entities.StudentEntity;
 import entities.UserEntity;
 import models.*;
+import models.mail.messageReader.EmailFile;
 import models.mail.messageReader.EmailMessageReader;
 
 import javax.mail.*;
@@ -21,22 +22,22 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
-public class YandexMailHandled extends BaseModel implements MailDao {
+public class YandexEmailHandled implements EmailDao {
 
     private final String yandexEmail;
     private final String password;
     private final String personal;
     private final String IMAP_host = "imap.yandex.ru";
-    private static MailDao instance = null;
+    private static EmailDao instance = null;
 
-    public static synchronized MailDao getInstance() throws MessagingException {
+    public static synchronized EmailDao getInstance() throws MessagingException {
         if (instance == null) {
-            instance = new YandexMailHandled();
+            instance = new YandexEmailHandled();
         }
         return instance;
     }
 
-    private YandexMailHandled() throws MessagingException {
+    private YandexEmailHandled() throws MessagingException {
         UserEntity user = UserModel.getInstance().getUser();
         if (user != null) {
             this.yandexEmail = user.getUsername();
@@ -116,7 +117,7 @@ public class YandexMailHandled extends BaseModel implements MailDao {
         try {
             mp = (MimeMultipart) message.getContent();
             for (int i = 0; i < mp.getCount(); i++) {
-                models.mail.messageReader.File file = EmailMessageReader.getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
+                EmailFile file = EmailMessageReader.getFileFromMimeBodyPart((MimeBodyPart) mp.getBodyPart(i));
                 if (file != null) {
                     if (file.getFileName().contains(".pdf")
                             || file.getFileName().contains(".docx")

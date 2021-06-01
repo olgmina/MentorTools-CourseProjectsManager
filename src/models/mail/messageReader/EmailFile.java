@@ -4,11 +4,11 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import java.io.IOException;
 
-public class File {
+public class EmailFile {
 
     private final MimeBodyPart mimeBodyPart;
 
-    public File(MimeBodyPart mimeBodyPart) {
+    public EmailFile(MimeBodyPart mimeBodyPart) {
         this.mimeBodyPart = mimeBodyPart;
     }
 

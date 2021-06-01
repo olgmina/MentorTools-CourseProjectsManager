@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import models.StatusModel;
 import models.StudentModel;
 import models.UserModel;
-import models.mail.YandexMailHandled;
+import models.mail.YandexEmailHandled;
 import models.mail.messageReader.EmailMessageReader;
 
 import javax.mail.Flags;
@@ -50,7 +50,7 @@ public class MainController extends BaseController implements Initializable {
             changeUser();
         } else {
             try {
-                UserController.yandexMailHandled = YandexMailHandled.getInstance();
+                UserController.yandexMailHandled = YandexEmailHandled.getInstance();
             } catch (MessagingException e) {
                 UserController.yandexMailHandled = null;
                 newAlert(Alert.AlertType.ERROR, ERROR, ERROR_WRONG_LOGIN_OR_PASSWORD);

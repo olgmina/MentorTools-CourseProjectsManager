@@ -8,7 +8,7 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.util.ArrayList;
 
-public interface MailDao {
+public interface EmailDao {
 
     int notSeenMessagesCount();
 
